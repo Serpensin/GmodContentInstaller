@@ -1,0 +1,128 @@
+{
+    "CSS Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/o2HPLiaKP3om7Ne/download",
+        "InternalName": "CSS Maps Addon 2021",
+        "DownloadSize": 59.1,
+        "InstallSize": 234
+    },
+    "CSS Content": {
+        "Url": "",
+        "InternalName": "CSS_Content",
+        "DownloadSize": 518,
+        "InstallSize": 1280
+    },
+    "DOD Content": {
+        "Url": "https://nextcloud.serpensin.com/s/9d6a7GRXakSkSR6/download",
+        "InternalName": "DOD Content Addon 2017",
+        "DownloadSize": 261,
+        "InstallSize": 796
+    },
+    "DOD Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/R8ijZHXRNGPYAPr/download",
+        "InternalName": "DOD Maps Addon 2017",
+        "DownloadSize": 84.4,
+        "InstallSize": 285
+    },
+    "HL1 Content": {
+        "Url": "https://nextcloud.serpensin.com/s/LzNgS5LJRRYwZJo/download",
+        "InternalName": "hl1_content_addon_apr2016",
+        "DownloadSize": 139,
+        "InstallSize": 303
+    },
+    "HL1 Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/rfEn2f4YR9sNXCL/download",
+        "InternalName": "hl1_maps_addon_apr2016",
+        "DownloadSize": 87.1,
+        "InstallSize": 324
+    },
+    "HL2 Ep1 Content": {
+        "Url": "https://nextcloud.serpensin.com/s/X8sw8rcXHXJaRJ7/download",
+        "InternalName": "HL2 Ep1 Content Addon 2021",
+        "DownloadSize": 551,
+        "InstallSize": 1010
+    },
+    "HL2 Ep1 Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/SHBDBywTf4Eb5Q2/download",
+        "InternalName": "HL2 Ep1 Maps Addon 2021",
+        "DownloadSize": 150,
+        "InstallSize": 532
+    },
+    "HL2 Ep2 Content": {
+        "Url": "https://nextcloud.serpensin.com/s/iXAe5SHSyAE7NLo/download",
+        "InternalName": "HL2 Ep2 Content Addon 2021",
+        "DownloadSize": 1080,
+        "InstallSize": 2110
+    },
+    "HL2 Ep2 Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/BoqSazp3YbFmyBc/download",
+        "InternalName": "HL2 Ep2 Maps Addon 2021",
+        "DownloadSize": 220,
+        "InstallSize": 725
+    },
+    "HL2 Extras Content": {
+        "Url": "https://nextcloud.serpensin.com/s/55LDLQLYcRRJb7L/download",
+        "InternalName": "HL2E Content Addon 2021",
+        "DownloadSize": 1210,
+        "InstallSize": 2720
+    },
+    "HL2 Extras Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/krWxZkLddGLWQCT/download",
+        "InternalName": "HL2E Maps Addon 2021",
+        "DownloadSize": 283,
+        "InstallSize": 954
+    },
+    "L4D Content": {
+        "Url": "https://nextcloud.serpensin.com/s/8wzM5spQ5GrofPz/download",
+        "InternalName": "l4d_content_addon_apr2016",
+        "DownloadSize": 1790,
+        "InstallSize": 3340
+    },
+    "L4D Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/edn2LQikw8NACLS/download",
+        "InternalName": "l4d_maps_addon_apr2016",
+        "DownloadSize": 262,
+        "InstallSize": 952
+    },
+    "L4D2 Content": {
+        "Url": "https://nextcloud.serpensin.com/s/eb5Do3SffFoEeGG/download",
+        "InternalName": "L4D2 Content Addon 2021",
+        "DownloadSize": 4910,
+        "InstallSize": 8620
+    },
+    "Portal 2 Content": {
+        "Url": "https://nextcloud.serpensin.com/s/aZMTqELkNq4gcRH/download",
+        "InternalName": "Portal 2 Content Addon",
+        "DownloadSize": 3000,
+        "InstallSize": 6500
+    },
+    "Portal 2 Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/GBs7YH5DRaNbq3q/download",
+        "InternalName": "Portal 2 Maps Addon 2021",
+        "DownloadSize": 600,
+        "InstallSize": 2770
+    },
+    "Portal Content": {
+        "Url": "https://nextcloud.serpensin.com/s/Zw3Lq7JZ4P6zGsD/download",
+        "InternalName": "Portal Content Addon 2021",
+        "DownloadSize": 350,
+        "InstallSize": 689
+    },
+    "Portal Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/ZoD9TdFF5CHn2iZ/download",
+        "InternalName": "Portal Maps Addon 2021",
+        "DownloadSize": 124,
+        "InstallSize": 406
+    },
+    "TF2 Content": {
+        "Url": "https://nextcloud.serpensin.com/s/zKde7de48Rq2gpg/download",
+        "InternalName": "TF2 Content Addon 2021",
+        "DownloadSize": 3890,
+        "InstallSize": 13900
+    },
+    "TF2 Maps": {
+        "Url": "https://nextcloud.serpensin.com/s/3JiAiZzZrc62gz8/download",
+        "InternalName": "TF2 Maps Addon 2021",
+        "DownloadSize": 2540,
+        "InstallSize": 4550
+    }
+}
