@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GModContentInstaller.Properties {
+namespace GModContentWizard.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace GModContentInstaller.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GModContentInstaller.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GModContentWizard.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,22 +63,19 @@ namespace GModContentInstaller.Properties {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///    &quot;CSS Maps&quot;: {
-        ///        &quot;Url&quot;: &quot;https://nextcloud.serpesin.com/s/o2HPLiaKP3om7Ne/download&quot;,
-        ///        &quot;InternalName&quot;: &quot;&quot;,
+        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/o2HPLiaKP3om7Ne/download&quot;,
+        ///        &quot;InternalName&quot;: &quot;CSS Maps Addon 2021&quot;,
         ///        &quot;DownloadSize&quot;: 59.1,
         ///        &quot;InstallSize&quot;: 234
         ///    },
         ///    &quot;CSS Content&quot;: {
-        ///        &quot;Url&quot;: &quot;&quot;,
-        ///        &quot;InternalName&quot;: &quot;&quot;,
+        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/LH4YyaM8sXNETjt/download&quot;,
+        ///        &quot;InternalName&quot;: &quot;CSS_Content&quot;,
         ///        &quot;DownloadSize&quot;: 518,
         ///        &quot;InstallSize&quot;: 1280
         ///    },
         ///    &quot;DOD Content&quot;: {
-        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/9d6a7GRXakSkSR6/download&quot;,
-        ///        &quot;InternalName&quot;: &quot;&quot;,
-        ///        &quot;DownloadSize&quot;: 261,
-        ///        &quot;InstallSize [rest of string was truncated]&quot;;.
+        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/9d6a7GRXakSkSR6/do [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string urls {
             get {

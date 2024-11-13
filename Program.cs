@@ -1,6 +1,6 @@
-using Sentry;
+using System.Reflection;
 
-namespace GModContentInstaller
+namespace GModContentWizard
 {
     internal static class Program
     {
@@ -10,12 +10,19 @@ namespace GModContentInstaller
         [STAThread]
         static void Main()
         {
+            string productName = GetAssemblyProduct();
+            Mutex mutex = new(true, productName, out bool isNewInstance);
+            if (!isNewInstance)
+            {
+                MessageBox.Show("The application is already running.", "Single Instance", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             // Sentry Setup
             SentrySdk.Init(o =>
             {
                 // Tells which project in Sentry to send events to:
-                o.Dsn = "https://5caa7114b50739ae7a97e73ab4076392@sentry.bloodygang.com/20";
+                o.Dsn = "https://5caa7114b50739ae7a97e73ab4076392@sentry.serpensin.com/20";
                 // When configuring for the first time, to see what the SDK is doing:
                 o.Debug = true;
                 // Set TracesSampleRate to 1.0 to capture 100% of transactions for tracing.
@@ -32,7 +39,16 @@ namespace GModContentInstaller
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new Main());
+        }
+
+        private static string GetAssemblyProduct()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            var productAttribute = (AssemblyProductAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyProductAttribute));
+
+            return productAttribute?.Product;
         }
     }
 }

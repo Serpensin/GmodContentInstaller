@@ -1,22 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GModContentInstaller
+﻿namespace GModContentWizard
 {
     internal class PathDetector
     {
+        /// <summary>
+        /// Array of drive letters to search for the Garry's Mod installation.
+        /// </summary>
+        static private readonly string[] Drives =
+            [
+                "A:\\", "B:\\", "C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\", "I:\\", "J:\\", "K:\\", "L:\\", "M:\\", "N:\\", "O:\\", "P:\\", "Q:\\", "R:\\", "S:\\", "T:\\", "U:\\", "V:\\", "W:\\", "X:\\", "Y:\\", "Z:\\"
+            ];
+
+        /// <summary>
+        /// List of potential paths where Garry's Mod addons might be located.
+        /// </summary>
+        static private readonly List<string> Paths =
+        [
+                "SteamLibrary\\steamapps\\common\\GarrysMod\\garrysmod\\addons",
+                "Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\addons"
+            ];
+
+        /// <summary>
+        /// Searches for the Garry's Mod addons directory in the predefined drives and paths.
+        /// </summary>
+        /// <returns>The path to the Garry's Mod addons directory if found; otherwise, null.</returns>
         static private string Search()
         {
-            var drive = new List<string> { "A:\\", "B:\\", "C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\", "I:\\", "J:\\", "K:\\", "L:\\", "M:\\", "N:\\", "O:\\", "P:\\", "Q:\\", "R:\\", "S:\\", "T:\\", "U:\\", "V:\\", "W:\\", "X:\\", "Y:\\", "Z:\\" };
-            var path = new List<string> { "SteamLibrary\\steamapps\\common\\GarrysMod\\garrysmod\\addons", "Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\addons" };
-            foreach (var item in drive)
+            foreach (var drive in Drives)
             {
-                foreach (var item2 in path)
+                foreach (var path in Paths)
                 {
-                    var test = Path.Combine(item, item2);
+                    var test = Path.Combine(drive, path);
                     if (Directory.Exists(test))
                     {
                         return test;
@@ -26,19 +39,28 @@ namespace GModContentInstaller
             return null;
         }
 
+        /// <summary>
+        /// Prompts the user to select the hl2.exe file from the Garry's Mod installation if the search fails.
+        /// </summary>
+        /// <returns>The path to the Garry's Mod addons directory if found or selected; otherwise, null.</returns>
         static public string Select()
         {
-            var SearchReturn = Search();
-            if (SearchReturn == null)
+            var searchReturn = Search();
+            if (searchReturn != null)
             {
-                var filePath = string.Empty;
+                return searchReturn;
+            }
+
+            while (true)
+            {
+                string filePath = string.Empty;
 
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
                     openFileDialog.InitialDirectory = "c:\\";
                     openFileDialog.Title = "Please select hl2.exe from GarrysMod";
                     openFileDialog.Filter = "GMod Application|hl2.exe";
-                    openFileDialog.FilterIndex = 2;
+                    openFileDialog.FilterIndex = 1;
                     openFileDialog.RestoreDirectory = true;
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -46,38 +68,40 @@ namespace GModContentInstaller
                         filePath = openFileDialog.FileName;
                     }
                 }
-                try
+
+                if (string.IsNullOrEmpty(filePath))
                 {
-                    Path.GetDirectoryName(filePath);
-                }
-                catch (Exception)
-                {
-                    DialogResult dialogResult = MessageBox.Show("You haven't selected anything.\nDo you wanna retry?", "Path Selector", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
-                    if (dialogResult == DialogResult.Yes)
+                    var dialogResult = MessageBox.Show(
+                        "You haven't selected anything.\nDo you want to retry?",
+                        "Path Selector",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Asterisk
+                    );
+
+                    if (dialogResult == DialogResult.No)
                     {
-                        Select();
+                        return null; // Exit if the user does not want to retry
                     }
-                    else if (dialogResult == DialogResult.No)
-                    {
-                        return null;
-                    }
+                    continue; // Retry loop if user selected "Yes"
                 }
-                var Paks = Path.GetDirectoryName(filePath) + "\\garrysmod\\addons";
-                if (Directory.Exists(Paks))
+
+                var selectedPath = Path.GetDirectoryName(filePath) ?? "";
+                var paksPath = Path.Combine(selectedPath, "garrysmod", "addons");
+
+                if (Directory.Exists(paksPath))
                 {
-                    return Paks;
+                    return paksPath; // Return valid path if it exists
                 }
                 else
                 {
-                    MessageBox.Show("Somehow you managed to select the wrong File.\nNow be a good person and select the right one. XD", "Path Selector", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    Select();
+                    MessageBox.Show(
+                        "Somehow you managed to select the wrong file.\nNow please select the correct one. XD",
+                        "Path Selector",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Asterisk
+                    );
                 }
             }
-            else
-            {
-                return (SearchReturn);
-            }
-            return "ERROR";
         }
     }
 }

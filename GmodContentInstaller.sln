@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GModContentInstaller", "GModContentInstaller.csproj", "{2780D691-9F29-4C42-A04C-410A47A2CCCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GModContentWizard", "GModContentWizard.csproj", "{2780D691-9F29-4C42-A04C-410A47A2CCCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
