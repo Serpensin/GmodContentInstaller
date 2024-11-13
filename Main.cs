@@ -186,7 +186,7 @@ namespace GModContentWizard
             {
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = "https://url.bloodygang.com/serpentmodding",
+                    FileName = "https://url.serpensin.com/serpentmodding",
                     UseShellExecute = true
                 });
             }
