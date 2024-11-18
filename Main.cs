@@ -57,26 +57,7 @@ namespace GModContentWizard
             return labelControl as Guna2HtmlLabel;
         }
 
-        public class TemporaryDirectory : IDisposable
-        {
-            public string DirectoryPath { get; }
-
-            public TemporaryDirectory()
-            {
-                DirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                Directory.CreateDirectory(DirectoryPath);
-            }
-
-            public void Dispose()
-            {
-                if (Directory.Exists(DirectoryPath))
-                {
-                    Directory.Delete(DirectoryPath, recursive: true);
-                }
-            }
-        }
-
-        private async Task<bool> canBeEnabledAsync(ContentInfo contentInfo)
+        private static async Task<bool> CanBeEnabledAsync(ContentInfo contentInfo)
         {
             bool isReachable = await UrlChecker.IsUrlReachableAsync(contentInfo.Url);
             return isReachable;
@@ -88,7 +69,7 @@ namespace GModContentWizard
             async Task UpdateContentAndMapsAsync(ContentInfo content, Guna2HtmlLabel? contentLabel, Guna2ToggleSwitch? contentButton, Guna2HtmlLabel? mapLabel, Guna2ToggleSwitch? mapButton)
             {
                 bool isInstalled = Directory.Exists(Path.Combine(addonsPath, content.InternalName));
-                bool canEnable = await canBeEnabledAsync(content);
+                bool canEnable = await CanBeEnabledAsync(content);
 
                 if (contentLabel != null && contentButton != null)
                 {
@@ -223,51 +204,48 @@ namespace GModContentWizard
             ToggleSwitchStateManager.DisableAllToggleSwitches(this);
 
             var toggleSwitches = Controls.OfType<Guna2ToggleSwitch>().ToList();
-            using (var tempDir = new TemporaryDirectory())
+            foreach (var button in toggleSwitches)
             {
-                foreach (var button in toggleSwitches)
+                string contentName = button.Name.Replace("Button", "");
+                if (!contentInfoDictionary.TryGetValue(contentName, out ContentInfo content))
                 {
-                    string contentName = button.Name.Replace("Button", "");
-                    if (!contentInfoDictionary.TryGetValue(contentName, out ContentInfo content))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var label = GetAssociatedLabel(button);
-                    if (button.Checked && label != null && label.ForeColor != Color.Green)
-                    {
-                        var file = Path.Combine(tempDir.DirectoryPath, content.InternalName + ".tar.gz");
-                        progressBarTextAnimator.StartAnimation("Downloading");
-                        await downloader.DownloadFileAsync(content.Url, content.InternalName + ".tar.gz", tempDir.DirectoryPath);
+                var label = GetAssociatedLabel(button);
+                if (button.Checked && label != null && label.ForeColor != Color.Green)
+                {
+                    var file = Path.Combine(pathShowLabel.Text, content.InternalName + ".tar.gz");
+                    progressBarTextAnimator.StartAnimation("Downloading");
+                    await downloader.DownloadFileAsync(content.Url, content.InternalName + ".tar.gz", pathShowLabel.Text);
 
-                        progressBarTextAnimator.StartAnimation("Extracting");
-                        await Task.Run(() => ArchiveExtractor.ExtractArchiveAsync(file, pathShowLabel.Text, progressBar));
-                        await Task.Run(() => File.Delete(file));
+                    progressBarTextAnimator.StartAnimation("Extracting");
+                    await Task.Run(() => ArchiveExtractor.ExtractArchiveAsync(file, pathShowLabel.Text, progressBar));
+                    await Task.Run(() => File.Delete(file));
 
-                        label.ForeColor = Color.Green;
-                        label.Text = label.Text.StartsWith("Content") ? $"Content ({DriveUsageUpdater.FormatSize(content.DownloadSize)})" : $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
-                    }
-                    else if (label != null && label.ForeColor == Color.Green)
+                    label.ForeColor = Color.Green;
+                    label.Text = label.Text.StartsWith("Content") ? $"Content ({DriveUsageUpdater.FormatSize(content.DownloadSize)})" : $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                }
+                else if (!button.Checked && label != null && label.ForeColor == Color.Green)
+                {
+                    progressBarTextAnimator.StartAnimation("Deleting");
+                    string contentPath = Path.Combine(pathShowLabel.Text, content.InternalName);
+                    if (Directory.Exists(contentPath))
                     {
-                        progressBarTextAnimator.StartAnimation("Deleting");
-                        string contentPath = Path.Combine(pathShowLabel.Text, content.InternalName);
-                        if (Directory.Exists(contentPath))
+                        await Task.Run(() => Directory.Delete(contentPath, recursive: true));
+                        string contentSizeInfo = $"{DriveUsageUpdater.FormatSize(content.DownloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)}";
+                        bool canEnable = await CanBeEnabledAsync(content);
+                        if (canEnable)
                         {
-                            await Task.Run(() => Directory.Delete(contentPath, recursive: true));
-                            string contentSizeInfo = $"{DriveUsageUpdater.FormatSize(content.DownloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)}";
-                            bool canEnable = await canBeEnabledAsync(content);
-                            if (canEnable)
-                            {
-                                label.ForeColor = Color.White;
-                                label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
-                            }
-                            else
-                            {
-                                label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
-                                label.ForeColor = Color.Red;
-                                button.Checked = false;
-                                button.Enabled = false;
-                            }
+                            label.ForeColor = Color.White;
+                            label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                        }
+                        else
+                        {
+                            label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                            label.ForeColor = Color.Red;
+                            button.Checked = false;
+                            button.Enabled = false;
                         }
                     }
                 }
