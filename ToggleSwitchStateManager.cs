@@ -5,7 +5,7 @@
     /// </summary>
     internal class ToggleSwitchStateManager
     {
-        private readonly Dictionary<Guna2ToggleSwitch, bool> toggleSwitchStates = new();
+        private readonly Dictionary<Guna2ToggleSwitch, bool> toggleSwitchStates = [];
 
         /// <summary>
         /// Saves the enabled state of all Guna2ToggleSwitch controls within the specified container.

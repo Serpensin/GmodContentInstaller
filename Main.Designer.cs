@@ -410,7 +410,7 @@
             guna2HtmlLabel1.AutoSize = false;
             guna2HtmlLabel1.BackColor = Color.FromArgb(32, 29, 30);
             guna2HtmlLabel1.Enabled = false;
-            guna2HtmlLabel1.Font = new Font("Jokerman", 15.75F);
+            guna2HtmlLabel1.Font = new Font("Microsoft Sans Serif", 15.75F);
             guna2HtmlLabel1.ForeColor = Color.White;
             guna2HtmlLabel1.Location = new Point(26, 37);
             guna2HtmlLabel1.Name = "guna2HtmlLabel1";
@@ -424,7 +424,7 @@
             guna2HtmlLabel2.AutoSize = false;
             guna2HtmlLabel2.BackColor = Color.FromArgb(32, 29, 30);
             guna2HtmlLabel2.Enabled = false;
-            guna2HtmlLabel2.Font = new Font("Jokerman", 9F);
+            guna2HtmlLabel2.Font = new Font("Microsoft Sans Serif", 9F);
             guna2HtmlLabel2.ForeColor = Color.White;
             guna2HtmlLabel2.Location = new Point(48, 94);
             guna2HtmlLabel2.Name = "guna2HtmlLabel2";
@@ -438,7 +438,7 @@
             guna2HtmlLabel3.AutoSize = false;
             guna2HtmlLabel3.BackColor = Color.FromArgb(32, 29, 30);
             guna2HtmlLabel3.Enabled = false;
-            guna2HtmlLabel3.Font = new Font("Jokerman", 9F);
+            guna2HtmlLabel3.Font = new Font("Microsoft Sans Serif", 9F);
             guna2HtmlLabel3.ForeColor = Color.White;
             guna2HtmlLabel3.Location = new Point(48, 130);
             guna2HtmlLabel3.Name = "guna2HtmlLabel3";
@@ -452,7 +452,7 @@
             guna2HtmlLabel4.AutoSize = false;
             guna2HtmlLabel4.BackColor = Color.FromArgb(32, 29, 30);
             guna2HtmlLabel4.Enabled = false;
-            guna2HtmlLabel4.Font = new Font("Jokerman", 9F);
+            guna2HtmlLabel4.Font = new Font("Microsoft Sans Serif", 9F);
             guna2HtmlLabel4.ForeColor = Color.White;
             guna2HtmlLabel4.Location = new Point(48, 166);
             guna2HtmlLabel4.Name = "guna2HtmlLabel4";
@@ -511,7 +511,7 @@
             titelLabel.AutoSize = false;
             titelLabel.BackColor = Color.Transparent;
             titelLabel.Enabled = false;
-            titelLabel.Font = new Font("Jokerman", 18F);
+            titelLabel.Font = new Font("Microsoft Sans Serif", 18F);
             titelLabel.ForeColor = Color.White;
             titelLabel.Location = new Point(0, 0);
             titelLabel.Name = "titelLabel";
@@ -1545,7 +1545,7 @@
             Controls.Add(cssPicture);
             Controls.Add(pathDetectButton);
             Controls.Add(guna2Panel1);
-            Font = new Font("Jokerman", 15.75F);
+            Font = new Font("Microsoft Sans Serif", 15.75F);
             FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;

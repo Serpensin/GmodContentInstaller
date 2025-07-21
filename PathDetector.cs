@@ -3,12 +3,12 @@
     internal class PathDetector
     {
         /// <summary>
-        /// Array of drive letters to search for the Garry's Mod installation.
+        /// Dynamically gets all available drive root paths (e.g. C:\, D:\, ...).
         /// </summary>
-        static private readonly string[] Drives =
-            [
-                "A:\\", "B:\\", "C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\", "I:\\", "J:\\", "K:\\", "L:\\", "M:\\", "N:\\", "O:\\", "P:\\", "Q:\\", "R:\\", "S:\\", "T:\\", "U:\\", "V:\\", "W:\\", "X:\\", "Y:\\", "Z:\\"
-            ];
+        static private IEnumerable<string> GetAvailableDrives()
+        {
+            return DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed || d.DriveType == DriveType.Removable).Select(d => d.Name);
+        }
 
         /// <summary>
         /// List of potential paths where Garry's Mod addons might be located.
@@ -25,7 +25,7 @@
         /// <returns>The path to the Garry's Mod addons directory if found; otherwise, null.</returns>
         static private string Search()
         {
-            foreach (var drive in Drives)
+            foreach (var drive in GetAvailableDrives())
             {
                 foreach (var path in Paths)
                 {
@@ -55,7 +55,7 @@
             {
                 string filePath = string.Empty;
 
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                using (OpenFileDialog openFileDialog = new())
                 {
                     openFileDialog.InitialDirectory = "c:\\";
                     openFileDialog.Title = "Please select hl2.exe from GarrysMod";
@@ -80,9 +80,9 @@
 
                     if (dialogResult == DialogResult.No)
                     {
-                        return null; // Exit if the user does not want to retry
+                        return null;
                     }
-                    continue; // Retry loop if user selected "Yes"
+                    continue;
                 }
 
                 var selectedPath = Path.GetDirectoryName(filePath) ?? "";
@@ -90,7 +90,7 @@
 
                 if (Directory.Exists(paksPath))
                 {
-                    return paksPath; // Return valid path if it exists
+                    return paksPath;
                 }
                 else
                 {

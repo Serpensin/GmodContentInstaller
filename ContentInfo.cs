@@ -49,19 +49,39 @@ namespace GModContentWizard
     public class ContentInfo
     {
         /// <summary>
-        /// Gets or sets the URL of the content.
+        /// Gets or sets the primary URL of the content.
         /// </summary>
-        public string Url { get; set; }
+        public string PrimaryUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the primary download size of the content in bytes.
+        /// </summary>
+        public long PrimaryDownloadSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the primary format of the content (e.g., "tar.gz" or "zip").
+        /// </summary>
+        public string PrimaryFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the secondary URL of the content.
+        /// </summary>
+        public string SecondaryUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the secondary download size of the content in bytes.
+        /// </summary>
+        public long SecondaryDownloadSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the secondary format of the content (e.g., "tar.gz" or "zip").
+        /// </summary>
+        public string SecondaryFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the internal name of the content.
         /// </summary>
         public string InternalName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the download size of the content in bytes.
-        /// </summary>
-        public long DownloadSize { get; set; }
 
         /// <summary>
         /// Gets or sets the install size of the content in bytes.

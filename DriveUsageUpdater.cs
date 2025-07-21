@@ -45,7 +45,6 @@
             drivespaceProgressBar.Value = usagePercent;
             drivespaceProgressBar.Text = $"{driveLetter}\\ {usagePercent}%";
 
-            // Change ToolTip from drivespaceProgressBar
             drivespaceProgressBarToolTip.IsBalloon = true;
             drivespaceProgressBarToolTip.SetToolTip(drivespaceProgressBar, $"Total: {FormatSize(totalSpace)}\nUsed: {FormatSize(adjustedUsedSpace)}\nFree: {FormatSize(totalSpace - adjustedUsedSpace)}");
         }
@@ -57,7 +56,7 @@
         /// <returns>A formatted string representing the size in appropriate units.</returns>
         public static string FormatSize(double size)
         {
-            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            string[] sizes = { "B", "KB", "MB", "GB", "TB", "PB" };
             int order = 0;
             while (size >= 1024 && order < sizes.Length - 1)
             {

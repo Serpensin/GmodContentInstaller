@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using Resources = GModContentWizard.Properties.Resources;
 
 namespace GModContentWizard
@@ -7,11 +8,39 @@ namespace GModContentWizard
     {
         private DriveUsageUpdater driveUsageUpdater;
         private Dictionary<string, ContentInfo> contentInfoDictionary;
-        private readonly UrlDictionary urlDictionary = new(Resources.urls);
         private readonly ProgressBarTextAnimator progressBarTextAnimator;
         private readonly Downloader downloader;
         private readonly ToggleSwitchStateManager toggleSwitchManager = new();
+        private readonly UrlDictionary urlDictionary = new(System.Text.Encoding.UTF8.GetString(Resources.urls));
 
+        private static readonly (string Key, string DisplayName)[] ContentKeys =
+        [
+            ("CSSContent", "CSS Content"),
+            ("CSSMaps", "CSS Maps"),
+            ("DODContent", "DOD Content"),
+            ("DODMaps", "DOD Maps"),
+            ("HL1Content", "HL1 Content"),
+            ("HL1Maps", "HL1 Maps"),
+            ("HL2Ep1Content", "HL2 Ep1 Content"),
+            ("HL2Ep1Maps", "HL2 Ep1 Maps"),
+            ("HL2Ep2Content", "HL2 Ep2 Content"),
+            ("HL2Ep2Maps", "HL2 Ep2 Maps"),
+            ("HL2ExtrasContent", "HL2 Extras Content"),
+            ("HL2ExtrasMaps", "HL2 Extras Maps"),
+            ("L4DContent", "L4D Content"),
+            ("L4DMaps", "L4D Maps"),
+            ("L4D2Content", "L4D2 Content"),
+            ("Portal2Content", "Portal 2 Content"),
+            ("Portal2Maps", "Portal 2 Maps"),
+            ("PortalContent", "Portal Content"),
+            ("PortalMaps", "Portal Maps"),
+            ("TF2Content", "TF2 Content"),
+            ("TF2Maps", "TF2 Maps")
+        ];
+
+        private enum ServerPreference { Primary, Secondary }
+        private ServerPreference preferredServer = ServerPreference.Primary;
+        private readonly Dictionary<string, ServerPreference> serverPreferencePerSession = [];
 
         public Main()
         {
@@ -23,99 +52,109 @@ namespace GModContentWizard
 
         private void InitializeContentInfo()
         {
-            contentInfoDictionary = new Dictionary<string, ContentInfo>
-            {
-                { "CSSContent", urlDictionary.GetContentInfoByName("CSS Content") },
-                { "CSSMaps", urlDictionary.GetContentInfoByName("CSS Maps") },
-                { "DODContent", urlDictionary.GetContentInfoByName("DOD Content") },
-                { "DODMaps", urlDictionary.GetContentInfoByName("DOD Maps") },
-                { "HL1Content", urlDictionary.GetContentInfoByName("HL1 Content") },
-                { "HL1Maps", urlDictionary.GetContentInfoByName("HL1 Maps") },
-                { "HL2Ep1Content", urlDictionary.GetContentInfoByName("HL2 Ep1 Content") },
-                { "HL2Ep1Maps", urlDictionary.GetContentInfoByName("HL2 Ep1 Maps") },
-                { "HL2Ep2Content", urlDictionary.GetContentInfoByName("HL2 Ep2 Content") },
-                { "HL2Ep2Maps", urlDictionary.GetContentInfoByName("HL2 Ep2 Maps") },
-                { "HL2ExtrasContent", urlDictionary.GetContentInfoByName("HL2 Extras Content") },
-                { "HL2ExtrasMaps", urlDictionary.GetContentInfoByName("HL2 Extras Maps") },
-                { "L4DContent", urlDictionary.GetContentInfoByName("L4D Content") },
-                { "L4DMaps", urlDictionary.GetContentInfoByName("L4D Maps") },
-                { "L4D2Content", urlDictionary.GetContentInfoByName("L4D2 Content") },
-                { "Portal2Content", urlDictionary.GetContentInfoByName("Portal 2 Content") },
-                { "Portal2Maps", urlDictionary.GetContentInfoByName("Portal 2 Maps") },
-                { "PortalContent", urlDictionary.GetContentInfoByName("Portal Content") },
-                { "PortalMaps", urlDictionary.GetContentInfoByName("Portal Maps") },
-                { "TF2Content", urlDictionary.GetContentInfoByName("TF2 Content") },
-                { "TF2Maps", urlDictionary.GetContentInfoByName("TF2 Maps") }
-            };
+            contentInfoDictionary = ContentKeys
+                .Select(pair => (pair.Key, Info: urlDictionary.GetContentInfoByName(pair.DisplayName)))
+                .Where(x => x.Info != null)
+                .ToDictionary(x => x.Key, x => x.Info!);
         }
+
         private Guna2HtmlLabel GetAssociatedLabel(Guna2ToggleSwitch toggleSwitch)
         {
             string labelName = toggleSwitch.Name.Replace("Button", "Label");
-
             var labelControl = this.Controls.Find(labelName, true).FirstOrDefault();
-
             return labelControl as Guna2HtmlLabel;
         }
 
-        private static async Task<bool> CanBeEnabledAsync(ContentInfo contentInfo)
+        private static async Task<bool> CanBeEnabledAsync(ContentInfo contentInfo, ServerPreference serverPref)
         {
-            bool isReachable = await UrlChecker.IsUrlReachableAsync(contentInfo.Url);
-            return isReachable;
+            string url = serverPref == ServerPreference.Primary ? contentInfo.PrimaryUrl : contentInfo.SecondaryUrl;
+            return await UrlChecker.IsUrlReachableAsync(url);
+        }
+
+        private static (string url, long downloadSize, string format) GetServerInfo(ContentInfo content, ServerPreference pref)
+        {
+            return pref == ServerPreference.Primary
+                ? (content.PrimaryUrl, content.PrimaryDownloadSize, content.PrimaryFormat)
+                : (content.SecondaryUrl, content.SecondaryDownloadSize, content.SecondaryFormat);
         }
 
         private async Task LoadInfo(string addonsPath)
         {
-#nullable enable
-            async Task UpdateContentAndMapsAsync(ContentInfo content, Guna2HtmlLabel? contentLabel, Guna2ToggleSwitch? contentButton, Guna2HtmlLabel? mapLabel, Guna2ToggleSwitch? mapButton)
+            async Task UpdateContentAndMapsAsync(ContentInfo content, Guna2HtmlLabel contentLabel, Guna2ToggleSwitch contentButton, Guna2HtmlLabel mapLabel, Guna2ToggleSwitch mapButton)
             {
                 bool isInstalled = Directory.Exists(Path.Combine(addonsPath, content.InternalName));
-                bool canEnable = await CanBeEnabledAsync(content);
+                var pref = serverPreferencePerSession.TryGetValue(content.InternalName, out var p) ? p : preferredServer;
+                bool canEnable = await CanBeEnabledAsync(content, pref);
+                var (url, downloadSize, format) = GetServerInfo(content, pref);
+
+                void SetLabelSafe(Guna2HtmlLabel label, Action<Guna2HtmlLabel> update)
+                {
+                    if (label.InvokeRequired)
+                        label.Invoke(update, label);
+                    else
+                        update(label);
+                }
+                void SetButtonSafe(Guna2ToggleSwitch button, Action<Guna2ToggleSwitch> update)
+                {
+                    if (button.InvokeRequired)
+                        button.Invoke(update, button);
+                    else
+                        update(button);
+                }
 
                 if (contentLabel != null && contentButton != null)
                 {
-                    if (canEnable)
+                    SetLabelSafe(contentLabel, l =>
                     {
-                        contentLabel.Text = $"Content ({DriveUsageUpdater.FormatSize(content.DownloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)})";
-                        contentButton.Enabled = true;
-                    }
-                    else
+                        if (canEnable)
+                        {
+                            l.Text = $"Content ({DriveUsageUpdater.FormatSize(downloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                        }
+                        else
+                        {
+                            l.ForeColor = Color.Red;
+                        }
+                        if (isInstalled)
+                        {
+                            l.ForeColor = Color.Green;
+                            l.Text = $"Content ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                        }
+                    });
+                    SetButtonSafe(contentButton, b =>
                     {
-                        contentLabel.ForeColor = Color.Red;
-                        contentButton.Checked = false;
-                        contentButton.Enabled = false;
-                    }
-                    if (isInstalled)
-                    {
-                        contentLabel.ForeColor = Color.Green;
-                        contentLabel.Text = $"Content ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
-                        contentButton.Checked = true;
-                        contentButton.Enabled = true;
-                    }
+                        b.Enabled = canEnable;
+                        if (!canEnable) b.Checked = false;
+                        if (isInstalled) { b.Checked = true; b.Enabled = true; }
+                    });
                 }
 
                 if (mapLabel != null && mapButton != null)
                 {
-                    if (canEnable)
+                    SetLabelSafe(mapLabel, l =>
                     {
-                        mapLabel.Text = $"Maps ({DriveUsageUpdater.FormatSize(content.DownloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)})";
-                        mapButton.Enabled = true;
-                    }
-                    else
+                        if (canEnable)
+                        {
+                            l.Text = $"Maps ({DriveUsageUpdater.FormatSize(downloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                        }
+                        else
+                        {
+                            l.ForeColor = Color.Red;
+                        }
+                        if (isInstalled)
+                        {
+                            l.ForeColor = Color.Green;
+                            l.Text = $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                        }
+                    });
+                    SetButtonSafe(mapButton, b =>
                     {
-                        mapLabel.ForeColor = Color.Red;
-                        mapButton.Checked = false;
-                        mapButton.Enabled = false;
-                    }
-                    if (isInstalled)
-                    {
-                        mapLabel.ForeColor = Color.Green;
-                        mapLabel.Text = $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
-                        mapButton.Enabled = true;
-                        mapButton.Checked = true;
-                    }
+                        b.Enabled = canEnable;
+                        if (!canEnable) b.Checked = false;
+                        if (isInstalled) { b.Checked = true; b.Enabled = true; }
+                    });
                 }
             }
-#nullable disable
+
             var tasks = new List<Task>
             {
                 UpdateContentAndMapsAsync(contentInfoDictionary["CSSContent"], CSSLabelContent, CSSButtonContent, null, null),
@@ -154,6 +193,47 @@ namespace GModContentWizard
                 pathDetectButton.Enabled = true;
                 return;
             }
+
+            var firstContent = contentInfoDictionary.Values.FirstOrDefault();
+            string primaryHost = null;
+            string secondaryHost = null;
+            if (firstContent != null)
+            {
+                if (!string.IsNullOrWhiteSpace(firstContent.PrimaryUrl))
+                    primaryHost = new Uri(firstContent.PrimaryUrl).Host;
+                if (!string.IsNullOrWhiteSpace(firstContent.SecondaryUrl))
+                    secondaryHost = new Uri(firstContent.SecondaryUrl).Host;
+            }
+            long primaryPing = long.MaxValue;
+            long secondaryPing = long.MaxValue;
+            using (var ping = new Ping())
+            {
+                if (!string.IsNullOrEmpty(primaryHost))
+                {
+                    try
+                    {
+                        var reply = await ping.SendPingAsync(primaryHost, 1500);
+                        if (reply.Status == IPStatus.Success)
+                            primaryPing = reply.RoundtripTime;
+                    }
+                    catch { }
+                }
+                if (!string.IsNullOrEmpty(secondaryHost))
+                {
+                    try
+                    {
+                        var reply = await ping.SendPingAsync(secondaryHost, 1500);
+                        if (reply.Status == IPStatus.Success)
+                            secondaryPing = reply.RoundtripTime;
+                    }
+                    catch { }
+                }
+            }
+            if (primaryPing <= secondaryPing)
+                preferredServer = ServerPreference.Primary;
+            else
+                preferredServer = ServerPreference.Secondary;
+
             driveUsageUpdater = new(Path.GetPathRoot(addonsPath)?.Substring(0, 2), drivespaceUsageBar);
             driveUsageUpdater.UpdateDriveSizeBar();
             pathShowLabel.Text = addonsPath;
@@ -167,7 +247,7 @@ namespace GModContentWizard
             {
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = "https://url.serpensin.com/serpentmodding",
+                    FileName = "https://url.serpensin.com/discord",
                     UseShellExecute = true
                 });
             }
@@ -180,7 +260,7 @@ namespace GModContentWizard
 
             if (associatedLabel == null)
             {
-                MessageBox.Show($"Label for {toggleSwitch.Name} not found!");
+                MessageBox.Show($"Label for {toggleSwitch.Name} not found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 SentrySdk.CaptureMessage($"Label for {toggleSwitch.Name} not found!");
                 return;
             }
@@ -188,13 +268,21 @@ namespace GModContentWizard
             string switchName = toggleSwitch.Name.Replace("Button", "");
             if (!contentInfoDictionary.TryGetValue(switchName, out ContentInfo content))
             {
-                MessageBox.Show($"Content for {switchName} not found in dictionary!");
+                MessageBox.Show($"Content for {switchName} not found in dictionary!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 SentrySdk.CaptureMessage($"Content for {switchName} not found in dictionary!");
                 return;
             }
 
             long installSize = content.InstallSize;
-            driveUsageUpdater.UpdateDriveSizeBar(toggleSwitch.Checked ? installSize : -installSize);
+            try
+            {
+                driveUsageUpdater.UpdateDriveSizeBar(toggleSwitch.Checked ? installSize : -installSize);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Drive update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SentrySdk.CaptureException(ex);
+            }
         }
 
         private async void DownloadButton_Click(object sender, EventArgs e)
@@ -213,18 +301,67 @@ namespace GModContentWizard
                 }
 
                 var label = GetAssociatedLabel(button);
+                var pref = serverPreferencePerSession.TryGetValue(content.InternalName, out var p) ? p : preferredServer;
+                var (url, downloadSize, format) = GetServerInfo(content, pref);
+                string fileExt = format == "zip" ? ".zip" : ".tar.gz";
+                var file = Path.Combine(pathShowLabel.Text, content.InternalName + fileExt);
+
                 if (button.Checked && label != null && label.ForeColor != Color.Green)
                 {
-                    var file = Path.Combine(pathShowLabel.Text, content.InternalName + ".tar.gz");
                     progressBarTextAnimator.StartAnimation("Downloading");
-                    await downloader.DownloadFileAsync(content.Url, content.InternalName + ".tar.gz", pathShowLabel.Text);
-
-                    progressBarTextAnimator.StartAnimation("Extracting");
-                    await Task.Run(() => ArchiveExtractor.ExtractArchiveAsync(file, pathShowLabel.Text, progressBar));
-                    await Task.Run(() => File.Delete(file));
-
-                    label.ForeColor = Color.Green;
-                    label.Text = label.Text.StartsWith("Content") ? $"Content ({DriveUsageUpdater.FormatSize(content.DownloadSize)})" : $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                    try
+                    {
+                        bool success = true;
+                        try
+                        {
+                            await downloader.DownloadFileAsync(url, content.InternalName + fileExt, pathShowLabel.Text);
+                        }
+                        catch
+                        {
+                            var altPref = pref == ServerPreference.Primary ? ServerPreference.Secondary : ServerPreference.Primary;
+                            var (altUrl, altDownloadSize, altFormat) = GetServerInfo(content, altPref);
+                            string altFileExt = altFormat == "zip" ? ".zip" : ".tar.gz";
+                            var altFile = Path.Combine(pathShowLabel.Text, content.InternalName + altFileExt);
+                            try
+                            {
+                                await downloader.DownloadFileAsync(altUrl, content.InternalName + altFileExt, pathShowLabel.Text);
+                                file = altFile;
+                                downloadSize = altDownloadSize;
+                                format = altFormat;
+                                serverPreferencePerSession[content.InternalName] = altPref;
+                            }
+                            catch
+                            {
+                                success = false;
+                            }
+                        }
+                        if (!success)
+                        {
+                            MessageBox.Show($"Download fehlgeschlagen für {content.InternalName} auf beiden Servern.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            continue;
+                        }
+                        progressBarTextAnimator.StartAnimation("Extracting");
+                        await Task.Run(() => ArchiveExtractor.ExtractArchiveAsync(file, pathShowLabel.Text, progressBar));
+                        await Task.Run(() => File.Delete(file));
+                        if (label.InvokeRequired)
+                        {
+                            label.Invoke(new Action(() =>
+                            {
+                                label.ForeColor = Color.Green;
+                                label.Text = label.Text.StartsWith("Content") ? $"Content ({DriveUsageUpdater.FormatSize(downloadSize)})" : $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                            }));
+                        }
+                        else
+                        {
+                            label.ForeColor = Color.Green;
+                            label.Text = label.Text.StartsWith("Content") ? $"Content ({DriveUsageUpdater.FormatSize(downloadSize)})" : $"Maps ({DriveUsageUpdater.FormatSize(content.InstallSize)})";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Download/Extract failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        SentrySdk.CaptureException(ex);
+                    }
                 }
                 else if (!button.Checked && label != null && label.ForeColor == Color.Green)
                 {
@@ -232,20 +369,49 @@ namespace GModContentWizard
                     string contentPath = Path.Combine(pathShowLabel.Text, content.InternalName);
                     if (Directory.Exists(contentPath))
                     {
-                        await Task.Run(() => Directory.Delete(contentPath, recursive: true));
-                        string contentSizeInfo = $"{DriveUsageUpdater.FormatSize(content.DownloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)}";
-                        bool canEnable = await CanBeEnabledAsync(content);
-                        if (canEnable)
+                        try
                         {
-                            label.ForeColor = Color.White;
-                            label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                            await Task.Run(() => Directory.Delete(contentPath, recursive: true));
+                            string contentSizeInfo = $"{DriveUsageUpdater.FormatSize(downloadSize)} / {DriveUsageUpdater.FormatSize(content.InstallSize)}";
+                            bool canEnable = await CanBeEnabledAsync(content, pref);
+                            if (label.InvokeRequired)
+                            {
+                                label.Invoke(new Action(() =>
+                                {
+                                    if (canEnable)
+                                    {
+                                        label.ForeColor = Color.White;
+                                        label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                                    }
+                                    else
+                                    {
+                                        label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                                        label.ForeColor = Color.Red;
+                                        button.Checked = false;
+                                        button.Enabled = false;
+                                    }
+                                }));
+                            }
+                            else
+                            {
+                                if (canEnable)
+                                {
+                                    label.ForeColor = Color.White;
+                                    label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                                }
+                                else
+                                {
+                                    label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
+                                    label.ForeColor = Color.Red;
+                                    button.Checked = false;
+                                    button.Enabled = false;
+                                }
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            label.Text = label.Text.StartsWith("Content") ? $"Content ({contentSizeInfo})" : $"Maps ({contentSizeInfo})";
-                            label.ForeColor = Color.Red;
-                            button.Checked = false;
-                            button.Enabled = false;
+                            MessageBox.Show($"Delete failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            SentrySdk.CaptureException(ex);
                         }
                     }
                 }

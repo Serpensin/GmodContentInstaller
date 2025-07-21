@@ -61,25 +61,12 @@ namespace GModContentWizard.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {
-        ///    &quot;CSS Maps&quot;: {
-        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/o2HPLiaKP3om7Ne/download&quot;,
-        ///        &quot;InternalName&quot;: &quot;CSS Maps Addon 2021&quot;,
-        ///        &quot;DownloadSize&quot;: 59.1,
-        ///        &quot;InstallSize&quot;: 234
-        ///    },
-        ///    &quot;CSS Content&quot;: {
-        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/LH4YyaM8sXNETjt/download&quot;,
-        ///        &quot;InternalName&quot;: &quot;CSS_Content&quot;,
-        ///        &quot;DownloadSize&quot;: 518,
-        ///        &quot;InstallSize&quot;: 1280
-        ///    },
-        ///    &quot;DOD Content&quot;: {
-        ///        &quot;Url&quot;: &quot;https://nextcloud.serpensin.com/s/9d6a7GRXakSkSR6/do [rest of string was truncated]&quot;;.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static string urls {
+        internal static byte[] urls {
             get {
-                return ResourceManager.GetString("urls", resourceCulture);
+                object obj = ResourceManager.GetObject("urls", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

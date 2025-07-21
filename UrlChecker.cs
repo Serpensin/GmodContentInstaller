@@ -42,8 +42,9 @@
         private static bool IsValidHotlinkContentType(string contentType)
         {
             var validContentTypes = new[] {
-                    "application/gzip"
-                };
+                "application/gzip",
+                "application/zip"
+            };
 
             return validContentTypes.Contains(contentType.ToLower());
         }
