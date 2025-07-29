@@ -18,7 +18,7 @@
         /// Starts the text animation on the progress bar.
         /// </summary>
         /// <param name="baseText">The base text to display before the animation dots. Default is "Downloading".</param>
-        public void StartAnimation(string baseText = "Downloading")
+        public async Task StartAnimation(string baseText = "Downloading")
         {
             _baseText = baseText;
 
@@ -26,7 +26,7 @@
                 return;
 
             _isAnimating = true;
-            AnimateText();
+            await AnimateText();
         }
 
         /// <summary>
@@ -42,7 +42,7 @@
         /// <summary>
         /// Animates the text on the progress bar by appending dots to the base text.
         /// </summary>
-        private async void AnimateText()
+        private async Task AnimateText()
         {
             while (_isAnimating)
             {

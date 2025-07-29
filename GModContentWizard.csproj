@@ -24,7 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Guna.UI2.WinForms" Version="2.0.4.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Sentry" Version="5.11.2" />
+    <PackageReference Include="SerpentModding.CustomCSharpModules" Version="1.1.0" />
     <PackageReference Include="SharpCompress" Version="0.40.0" />
   </ItemGroup>
   <ItemGroup>
