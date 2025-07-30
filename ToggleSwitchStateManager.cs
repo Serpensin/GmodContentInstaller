@@ -41,5 +41,15 @@
                 entry.Key.Enabled = entry.Value;
             }
         }
+
+        /// <summary>
+        /// Adds or updates the saved enabled state of a specific Guna2ToggleSwitch.
+        /// </summary>
+        /// <param name="toggleSwitch">The Guna2ToggleSwitch control to update.</param>
+        /// <param name="enabled">The enabled state to save.</param>
+        public void AddOrUpdateToggleSwitchState(Guna2ToggleSwitch toggleSwitch, bool enabled)
+        {
+            toggleSwitchStates[toggleSwitch] = enabled;
+        }
     }
 }

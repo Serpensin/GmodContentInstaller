@@ -28,7 +28,7 @@ namespace GModContentWizard
 
             EnsureConsoleAttached();
             Logger.Instance.Info("Console attached (if needed)");
-            if (args.Any(a => a.Equals("--help", StringComparison.OrdinalIgnoreCase)))
+            if (args != null && args.Any(a => a.Equals("--help", StringComparison.OrdinalIgnoreCase)))
             {
                 Logger.Instance.Info("Help argument detected. Showing help.");
                 Console.WriteLine("DiscordEmojiDownloader - Options:");
@@ -39,12 +39,12 @@ namespace GModContentWizard
                 Environment.Exit(0);
             }
 #if DEBUG
-            LogLevel logLevel = LogLevel.Debug;
+            LogLevel logLevel = LogLevel.Trace;
 #else
             LogLevel logLevel = LogLevel.Info;
 #endif
             Logger.Instance.Debug("Parsing command line arguments for log level");
-            foreach (var arg in args)
+            foreach (var arg in args ?? Array.Empty<string>())
             {
                 if (arg.StartsWith("--log-level=", StringComparison.OrdinalIgnoreCase))
                 {
