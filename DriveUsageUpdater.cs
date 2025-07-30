@@ -1,6 +1,4 @@
 ﻿using SerpentModding;
-using System.IO;
-using Guna.UI2.WinForms;
 
 namespace GModContentWizard
 {
