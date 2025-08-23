@@ -5,8 +5,8 @@ namespace GModContentWizard
     internal static class PathDetector
     {
         private const string InitialDirectory = "c:\\";
-        private const string DialogTitle = "Please select hl2.exe from GarrysMod";
-        private const string DialogFilter = "GMod Application|hl2.exe";
+        private const string DialogTitle = "Please select gmod.exe from GarrysMod";
+        private const string DialogFilter = "GMod Application|gmod.exe";
         private const string RetryMessage = "You haven't selected anything.\nDo you want to retry?";
         private const string RetryTitle = "Path Selector";
         private const string WrongFileMessage = "Somehow you managed to select the wrong file.\nNow please select the correct one. XD";
@@ -19,7 +19,7 @@ namespace GModContentWizard
         ];
 
         /// <summary>
-        /// Prompts the user to select the hl2.exe file from the Garry's Mod installation if the search fails.
+        /// Prompts the user to select the gmod.exe file from the Garry's Mod installation if the search fails.
         /// </summary>
         /// <returns>The path to the Garry's Mod addons directory if found or selected; otherwise, null.</returns>
         public static string Select()
