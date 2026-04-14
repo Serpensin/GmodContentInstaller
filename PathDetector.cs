@@ -1,167 +1,177 @@
-﻿using SerpentModding;
+#nullable enable
+using System;
+using System.Diagnostics;
+using System.IO;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using Serilog;
 
 namespace GModContentWizard
 {
     internal static class PathDetector
     {
-        private const string InitialDirectory = "c:\\";
-        private const string DialogTitle = "Please select gmod.exe from GarrysMod";
-        private const string DialogFilter = "GMod Application|gmod.exe";
-        private const string RetryMessage = "You haven't selected anything.\nDo you want to retry?";
-        private const string RetryTitle = "Path Selector";
-        private const string WrongFileMessage = "Somehow you managed to select the wrong file.\nNow please select the correct one. XD";
-        private const string AddonsSubPath = "garrysmod";
-        private const string AddonsFolder = "addons";
-        private static readonly List<string> Paths =
-        [
-            "SteamLibrary\\steamapps\\common\\GarrysMod\\garrysmod\\addons",
-            "Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\addons"
-        ];
-
-        /// <summary>
-        /// Prompts the user to select the gmod.exe file from the Garry's Mod installation if the search fails.
-        /// </summary>
-        /// <returns>The path to the Garry's Mod addons directory if found or selected; otherwise, null.</returns>
-        public static string Select()
+        public static string? Select()
         {
-            Logger.Instance.Trace("Select() called");
+            Log.Information("PathDetector.Select() called");
             var searchReturn = Search();
             if (searchReturn != null)
             {
-                Logger.Instance.Info($"Addons path found automatically: {searchReturn}");
+                Log.Information("Addons path found automatically: {Path}", searchReturn);
                 return searchReturn;
             }
 
-            while (true)
-            {
-                string filePath = ShowFileDialog();
-                if (string.IsNullOrEmpty(filePath))
-                {
-                    Logger.Instance.Warn("No file selected by user");
-                    if (!AskUserToRetry())
-                    {
-                        Logger.Instance.Info("User chose not to retry selecting path");
-                        return null;
-                    }
-                    continue;
-                }
-
-                if (IsValidAddonsPath(filePath, out var addonsPath))
-                {
-                    Logger.Instance.Info($"User selected valid Garry's Mod addons directory: {addonsPath}");
-                    return addonsPath;
-                }
-                else
-                {
-                    Logger.Instance.Error($"User selected wrong file: {filePath}");
-                    ShowWrongFileMessage();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Dynamically gets all available drive root paths (e.g. C:\, D:\, ...).
-        /// </summary>
-        private static IEnumerable<string> GetAvailableDrives()
-        {
-            Logger.Instance.Trace("GetAvailableDrives() called");
-            foreach (var drive in DriveInfo.GetDrives())
-            {
-                if (drive.DriveType == DriveType.Fixed || drive.DriveType == DriveType.Removable)
-                {
-                    Logger.Instance.Debug($"Available drive: {drive.Name}");
-                    yield return drive.Name;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Searches for the Garry's Mod addons directory in the predefined drives and paths.
-        /// </summary>
-        /// <returns>The path to the Garry's Mod addons directory if found; otherwise, null.</returns>
-        private static string Search()
-        {
-            Logger.Instance.Trace("Search() called");
-            foreach (var drive in GetAvailableDrives())
-            {
-                foreach (var path in Paths)
-                {
-                    var test = Path.Combine(drive, path);
-                    Logger.Instance.Debug($"Checking path: {test}");
-                    if (Directory.Exists(test))
-                    {
-                        Logger.Instance.Info($"Found Garry's Mod addons directory: {test}");
-                        return test;
-                    }
-                }
-            }
-            Logger.Instance.Warn("No Garry's Mod addons directory found in predefined paths");
             return null;
         }
 
-        /// <summary>
-        /// Shows the OpenFileDialog for selecting hl2.exe.
-        /// </summary>
-        /// <returns>The selected file path or empty string if cancelled.</returns>
-        private static string ShowFileDialog()
+        public static string? Search()
         {
-            Logger.Instance.Debug("Prompting user to select hl2.exe");
-            using (OpenFileDialog openFileDialog = new())
-            {
-                openFileDialog.InitialDirectory = InitialDirectory;
-                openFileDialog.Title = DialogTitle;
-                openFileDialog.Filter = DialogFilter;
-                openFileDialog.FilterIndex = 1;
-                openFileDialog.RestoreDirectory = true;
+            Log.Information("Searching for Garry's Mod addons directory");
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (OperatingSystem.IsWindows())
+            {
+                return SearchWindows();
+            }
+            else
+            {
+                return SearchLinux();
+            }
+        }
+
+        private static string? SearchWindows()
+        {
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (drive.DriveType != DriveType.Fixed && drive.DriveType != DriveType.Removable)
+                    continue;
+
+                var paths = new[]
                 {
-                    Logger.Instance.Info($"User selected file: {openFileDialog.FileName}");
-                    return openFileDialog.FileName;
+                    @"SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons",
+                    @"Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons"
+                };
+
+                foreach (var path in paths)
+                {
+                    var testPath = Path.Combine(drive.Name, path);
+                    Log.Debug("Checking: {Path}", testPath);
+                    if (Directory.Exists(testPath))
+                    {
+                        Log.Information("Found addons at: {Path}", testPath);
+                        return testPath;
+                    }
                 }
             }
-            return string.Empty;
+
+            Log.Warning("No addons directory found on Windows");
+            return null;
         }
 
-        /// <summary>
-        /// Validates if the selected file path leads to a valid Garry's Mod addons directory.
-        /// </summary>
-        /// <param name="filePath">The selected file path.</param>
-        /// <param name="addonsPath">The resulting addons path if valid.</param>
-        /// <returns>True if valid, otherwise false.</returns>
-        private static bool IsValidAddonsPath(string filePath, out string addonsPath)
+        private static string? SearchLinux()
         {
-            var selectedPath = Path.GetDirectoryName(filePath) ?? string.Empty;
-            addonsPath = Path.Combine(selectedPath, AddonsSubPath, AddonsFolder);
-            Logger.Instance.Debug($"Checking user selected path: {addonsPath}");
-            return Directory.Exists(addonsPath);
+            try
+            {
+                var home = Environment.GetEnvironmentVariable("HOME");
+                if (string.IsNullOrEmpty(home))
+                {
+                    Log.Warning("HOME environment variable not set");
+                    return null;
+                }
+
+                Log.Information("Searching in HOME: {Home}", home);
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "find",
+                        Arguments = $"{home} /var/run /mnt -type f -name \"hl2_linux\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                Log.Debug("find output: {Output}", output);
+                if (!string.IsNullOrEmpty(error))
+                    Log.Debug("find error: {Error}", error);
+
+                var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (var line in lines)
+                {
+                    var trimmedPath = line.Trim();
+                    if (string.IsNullOrEmpty(trimmedPath)) continue;
+
+                    Log.Debug("Found hl2_linux at: {Path}", trimmedPath);
+
+                    if (IsGarrysModHL2(trimmedPath))
+                    {
+                        var gmodRoot = Path.GetDirectoryName(trimmedPath);
+                        if (gmodRoot != null)
+                        {
+                            var addonsPath = Path.Combine(gmodRoot, "garrysmod", "addons");
+                            Log.Information("Found GMod addons at: {Path}", addonsPath);
+                            return addonsPath;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error searching for GMod on Linux");
+            }
+
+            Log.Warning("No addons directory found on Linux");
+            return null;
         }
 
-        /// <summary>
-        /// Shows a retry MessageBox and returns true if the user wants to retry.
-        /// </summary>
-        private static bool AskUserToRetry()
+        private static bool IsGarrysModHL2(string hl2Path)
         {
-            var dialogResult = MessageBox.Show(
-                RetryMessage,
-                RetryTitle,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Asterisk
-            );
-            return dialogResult == DialogResult.Yes;
+            try
+            {
+                var gmodRoot = Path.GetDirectoryName(hl2Path);
+                if (gmodRoot == null) return false;
+
+                var garrysmodPath = Path.Combine(gmodRoot, "garrysmod");
+                Log.Debug("Checking if {Path} exists", garrysmodPath);
+                return Directory.Exists(garrysmodPath);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        /// <summary>
-        /// Shows a MessageBox for a wrong file selection.
-        /// </summary>
-        private static void ShowWrongFileMessage()
+        public static async Task<string?> SelectWithDialog(Window window)
         {
-            MessageBox.Show(
-                WrongFileMessage,
-                RetryTitle,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Asterisk
-            );
+            var topLevel = TopLevel.GetTopLevel(window);
+            if (topLevel == null) return null;
+
+            var files = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = "Select Garry's Mod addons folder",
+                AllowMultiple = false
+            });
+
+            if (files.Count > 0)
+            {
+                var path = files[0].Path.LocalPath;
+                var addonsPath = Path.Combine(path, "garrysmod", "addons");
+                if (Directory.Exists(addonsPath))
+                    return addonsPath;
+                
+                if (Directory.Exists(path) && Path.GetFileName(path) == "addons")
+                    return path;
+            }
+
+            return null;
         }
     }
 }
