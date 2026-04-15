@@ -11,51 +11,40 @@ namespace GModContentWizard
 {
     internal static class PathDetector
     {
+        private static readonly string[] SearchPaths =
+        [
+            @"SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons",
+            @"Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons"
+        ];
+
         public static string? Select()
         {
             Log.Information("PathDetector.Select() called");
-            var searchReturn = Search();
-            if (searchReturn != null)
-            {
-                Log.Information("Addons path found automatically: {Path}", searchReturn);
-                return searchReturn;
-            }
-
-            return null;
-        }
-
-        public static string? Search()
-        {
-            Log.Information("Searching for Garry's Mod addons directory");
 
             if (OperatingSystem.IsWindows())
             {
-                return SearchWindows();
+                return SelectWindows();
             }
             else
             {
-                return SearchLinux();
+                return SelectLinux();
             }
         }
 
-        private static string? SearchWindows()
+        private static string? SelectWindows()
         {
+            Log.Information("Searching for Garry's Mod on Windows");
+
             foreach (var drive in DriveInfo.GetDrives())
             {
                 if (drive.DriveType != DriveType.Fixed && drive.DriveType != DriveType.Removable)
                     continue;
 
-                var paths = new[]
-                {
-                    @"SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons",
-                    @"Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons"
-                };
-
-                foreach (var path in paths)
+                foreach (var path in SearchPaths)
                 {
                     var testPath = Path.Combine(drive.Name, path);
                     Log.Debug("Checking: {Path}", testPath);
-                    if (Directory.Exists(testPath))
+                    if (Directory.Exists(testPath) && IsValidGModPath(Path.GetDirectoryName(testPath)!))
                     {
                         Log.Information("Found addons at: {Path}", testPath);
                         return testPath;
@@ -63,7 +52,21 @@ namespace GModContentWizard
                 }
             }
 
-            Log.Warning("No addons directory found on Windows");
+            Log.Warning("No addons directory found automatically on Windows");
+            return null;
+        }
+
+        private static string? SelectLinux()
+        {
+            Log.Information("Searching for Garry's Mod on Linux");
+
+            var searchReturn = SearchLinux();
+            if (searchReturn != null)
+            {
+                Log.Information("Addons path found automatically: {Path}", searchReturn);
+                return searchReturn;
+            }
+
             return null;
         }
 
@@ -139,9 +142,36 @@ namespace GModContentWizard
                 var gmodRoot = Path.GetDirectoryName(hl2Path);
                 if (gmodRoot == null) return false;
 
-                var garrysmodPath = Path.Combine(gmodRoot, "garrysmod");
+                return IsValidGModPath(gmodRoot);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsValidGModPath(string rootPath)
+        {
+            try
+            {
+                var garrysmodPath = Path.Combine(rootPath, "garrysmod");
                 Log.Debug("Checking if {Path} exists", garrysmodPath);
-                return Directory.Exists(garrysmodPath);
+                if (!Directory.Exists(garrysmodPath))
+                    return false;
+
+                var appIdPath = Path.Combine(rootPath, "steam_appid.txt");
+                if (File.Exists(appIdPath))
+                {
+                    var appId = File.ReadAllText(appIdPath).Trim();
+                    Log.Debug("steam_appid.txt contains: {AppId}", appId);
+                    if (appId == "4000")
+                    {
+                        Log.Information("Verified GMod via steam_appid.txt (4000)");
+                        return true;
+                    }
+                }
+
+                return Directory.Exists(Path.Combine(garrysmodPath, "gamemodes"));
             }
             catch
             {
