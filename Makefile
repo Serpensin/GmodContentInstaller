@@ -1,6 +1,20 @@
-.PHONY: all run clean publish-linux publish-windows publish-all test-structure test-clean
+.PHONY: all run clean publish-linux publish-windows publish-all test-structure test-clean help
 
-all: run
+help:
+	@echo "GMod Content Wizard - Makefile"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  make run             - Run the application"
+	@echo "  make publish-linux   - Build Linux executable"
+	@echo "  make publish-windows - Build Windows executable"
+	@echo "  make publish-all     - Build both executables"
+	@echo "  make test-structure  - Create test structure for path detection"
+	@echo "  make test-clean      - Delete test structure"
+	@echo "  make clean           - Clean build files"
+	@echo ""
+	@echo "Default target: help"
+
+all: help
 
 run:
 	dotnet run
@@ -21,11 +35,11 @@ publish-all: publish-linux publish-windows
 test-structure:
 	@if [ "$(OS)" = "Windows_NT" ] || [ -n "$$WINDIR" ]; then \
 		echo "Erstelle Test-Struktur (Windows)..."; \
-		mkdir "%USERPROFILE%\gmod-test\steamapps\common\GarrysMod\garrysmod\addons" 2>nul; \
-		mkdir "%USERPROFILE%\gmod-test\steamapps\common\GarrysMod\garrysmod\gamemodes" 2>nul; \
-		echo 4000 > "%USERPROFILE%\gmod-test\steamapps\common\GarrysMod\steam_appid.txt"; \
-		type nul > "%USERPROFILE%\gmod-test\steamapps\common\GarrysMod\hl2.exe"; \
-		echo "Erstellt: %USERPROFILE%\gmod-test"; \
+		mkdir "%USERPROFILE%\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons" 2>nul; \
+		mkdir "%USERPROFILE%\SteamLibrary\steamapps\common\GarrysMod\garrysmod\gamemodes" 2>nul; \
+		echo 4000 > "%USERPROFILE%\SteamLibrary\steamapps\common\GarrysMod\steam_appid.txt"; \
+		type nul > "%USERPROFILE%\SteamLibrary\steamapps\common\GarrysMod\hl2.exe"; \
+		echo "Erstellt: %USERPROFILE%\SteamLibrary"; \
 		echo "  steamapps\common\GarrysMod\hl2.exe"; \
 		echo "  steamapps\common\GarrysMod\steam_appid.txt (mit 4000)"; \
 		echo "  steamapps\common\GarrysMod\garrysmod\addons\"; \
@@ -47,8 +61,8 @@ test-structure:
 test-clean:
 	@if [ "$(OS)" = "Windows_NT" ] || [ -n "$$WINDIR" ]; then \
 		echo "Lösche Test-Struktur (Windows)..."; \
-		rmdir /s /q "%USERPROFILE%\gmod-test" 2>nul; \
-		echo "Gelöscht: %USERPROFILE%\gmod-test"; \
+		rmdir /s /q "%USERPROFILE%\SteamLibrary" 2>nul; \
+		echo "Gelöscht: %USERPROFILE%\SteamLibrary"; \
 	else \
 		echo "Lösche Test-Struktur (Linux)..."; \
 		rm -rf ~/gmod-test; \

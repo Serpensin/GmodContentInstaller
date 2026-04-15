@@ -32,7 +32,7 @@ namespace GModContentWizard
         /// <param name="name">The name of the content.</param>
         /// <returns>The <see cref="ContentInfo"/> associated with the specified name, or null if not found.</returns>
         /// <exception cref="ArgumentException">Thrown when the name is null or empty.</exception>
-        public ContentInfo GetContentInfoByName(string name)
+        public ContentInfo? GetContentInfoByName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -48,44 +48,13 @@ namespace GModContentWizard
     /// </summary>
     public class ContentInfo
     {
-        /// <summary>
-        /// Gets or sets the primary URL of the content.
-        /// </summary>
-        public string PrimaryUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the primary download size of the content in bytes.
-        /// </summary>
+        public string PrimaryUrl { get; set; } = null!;
         public long PrimaryDownloadSize { get; set; }
-
-        /// <summary>
-        /// Gets or sets the primary format of the content (e.g., "tar.gz" or "zip").
-        /// </summary>
-        public string PrimaryFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the secondary URL of the content.
-        /// </summary>
-        public string SecondaryUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the secondary download size of the content in bytes.
-        /// </summary>
+        public string PrimaryFormat { get; set; } = null!;
+        public string SecondaryUrl { get; set; } = null!;
         public long SecondaryDownloadSize { get; set; }
-
-        /// <summary>
-        /// Gets or sets the secondary format of the content (e.g., "tar.gz" or "zip").
-        /// </summary>
-        public string SecondaryFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the internal name of the content.
-        /// </summary>
-        public string InternalName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the install size of the content in bytes.
-        /// </summary>
+        public string SecondaryFormat { get; set; } = null!;
+        public string InternalName { get; set; } = null!;
         public long InstallSize { get; set; }
     }
 }

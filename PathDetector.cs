@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -44,7 +43,7 @@ namespace GModContentWizard
                 {
                     var testPath = Path.Combine(drive.Name, path);
                     Log.Debug("Checking: {Path}", testPath);
-                    if (Directory.Exists(testPath) && IsValidGModPath(Path.GetDirectoryName(testPath)!))
+                    if (Directory.Exists(testPath))
                     {
                         Log.Information("Found addons at: {Path}", testPath);
                         return testPath;
@@ -83,9 +82,9 @@ namespace GModContentWizard
 
                 Log.Information("Searching in HOME: {Home}", home);
 
-                var process = new Process
+                var process = new System.Diagnostics.Process
                 {
-                    StartInfo = new ProcessStartInfo
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
                     {
                         FileName = "find",
                         Arguments = $"{home} /var/run /mnt -type f -name \"hl2_linux\"",
@@ -116,10 +115,10 @@ namespace GModContentWizard
 
                     if (IsGarrysModHL2(trimmedPath))
                     {
-                        var gmodRoot = Path.GetDirectoryName(trimmedPath);
+                        var gmodRoot = System.IO.Path.GetDirectoryName(trimmedPath);
                         if (gmodRoot != null)
                         {
-                            var addonsPath = Path.Combine(gmodRoot, "garrysmod", "addons");
+                            var addonsPath = System.IO.Path.Combine(gmodRoot, "garrysmod", "addons");
                             Log.Information("Found GMod addons at: {Path}", addonsPath);
                             return addonsPath;
                         }
@@ -139,7 +138,7 @@ namespace GModContentWizard
         {
             try
             {
-                var gmodRoot = Path.GetDirectoryName(hl2Path);
+                var gmodRoot = System.IO.Path.GetDirectoryName(hl2Path);
                 if (gmodRoot == null) return false;
 
                 return IsValidGModPath(gmodRoot);
@@ -154,15 +153,15 @@ namespace GModContentWizard
         {
             try
             {
-                var garrysmodPath = Path.Combine(rootPath, "garrysmod");
+                var garrysmodPath = System.IO.Path.Combine(rootPath, "garrysmod");
                 Log.Debug("Checking if {Path} exists", garrysmodPath);
-                if (!Directory.Exists(garrysmodPath))
+                if (!System.IO.Directory.Exists(garrysmodPath))
                     return false;
 
-                var appIdPath = Path.Combine(rootPath, "steam_appid.txt");
-                if (File.Exists(appIdPath))
+                var appIdPath = System.IO.Path.Combine(rootPath, "steam_appid.txt");
+                if (System.IO.File.Exists(appIdPath))
                 {
-                    var appId = File.ReadAllText(appIdPath).Trim();
+                    var appId = System.IO.File.ReadAllText(appIdPath).Trim();
                     Log.Debug("steam_appid.txt contains: {AppId}", appId);
                     if (appId == "4000")
                     {
@@ -171,7 +170,7 @@ namespace GModContentWizard
                     }
                 }
 
-                return Directory.Exists(Path.Combine(garrysmodPath, "gamemodes"));
+                return System.IO.Directory.Exists(System.IO.Path.Combine(garrysmodPath, "gamemodes"));
             }
             catch
             {
@@ -193,11 +192,11 @@ namespace GModContentWizard
             if (files.Count > 0)
             {
                 var path = files[0].Path.LocalPath;
-                var addonsPath = Path.Combine(path, "garrysmod", "addons");
-                if (Directory.Exists(addonsPath))
+                var addonsPath = System.IO.Path.Combine(path, "garrysmod", "addons");
+                if (System.IO.Directory.Exists(addonsPath))
                     return addonsPath;
                 
-                if (Directory.Exists(path) && Path.GetFileName(path) == "addons")
+                if (System.IO.Directory.Exists(path) && System.IO.Path.GetFileName(path) == "addons")
                     return path;
             }
 

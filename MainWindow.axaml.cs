@@ -1,6 +1,7 @@
 #nullable enable
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Serilog;
 using System;
@@ -48,7 +49,7 @@ namespace GModContentWizard
                 Log.Information("Loaded content from file: {Path}", urlJsonPath);
             }
             
-            downloader = new Downloader(ProgressBar);
+            downloader = new Downloader(ProgressBar, DownloadButton, StatusText);
             driveUsageUpdater = new DriveUsageUpdater(DriveSpaceUsageBar);
         }
 
@@ -107,6 +108,24 @@ namespace GModContentWizard
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to open Discord link");
+            }
+        }
+
+        private void PathShowLabel_Click(object? sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(addonsPath)) return;
+
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = addonsPath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to open addons folder");
             }
         }
 
@@ -420,7 +439,7 @@ namespace GModContentWizard
                 await downloader!.DownloadFileAsync(url, content.InternalName + fileExt, addonsPath);
                 Log.Information("Download successful for {Name}", content.InternalName);
 
-                await ArchiveExtractor.ExtractArchiveAsync(file, addonsPath, ProgressBar);
+                await ArchiveExtractor.ExtractArchiveAsync(file, addonsPath, ProgressBar, DownloadButton, StatusText);
                 await Task.Run(() => File.Delete(file));
                 Log.Information("Extraction done for {Name}", content.InternalName);
 

@@ -3,7 +3,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
@@ -12,12 +14,33 @@ namespace GModContentWizard
 {
     internal static class ArchiveExtractor
     {
-        public static async Task ExtractArchiveAsync(string archivePath, string destinationPath, ProgressBar progressBar)
+        private static Button? _downloadButton;
+        private static TextBlock? _statusText;
+        private static int _dotCount = 0;
+        private static System.Timers.Timer? _dotTimer;
+
+        public static async Task ExtractArchiveAsync(string archivePath, string destinationPath, ProgressBar progressBar, Button? downloadButton = null, TextBlock? statusText = null)
         {
+            _downloadButton = downloadButton;
+            _statusText = statusText;
+            
             if (!File.Exists(archivePath))
                 throw new FileNotFoundException($"Archive file not found: {archivePath}");
 
             Directory.CreateDirectory(destinationPath);
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                progressBar.IsVisible = true;
+                if (_downloadButton != null) _downloadButton.IsVisible = false;
+                if (_statusText != null)
+                {
+                    _statusText.IsVisible = true;
+                    _statusText.Text = "Extracting.";
+                }
+            });
+
+            StartDotAnimation();
 
             if (archivePath.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase))
             {
@@ -25,14 +48,51 @@ namespace GModContentWizard
             }
             else if (archivePath.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
             {
-                ExtractZip(archivePath, destinationPath, progressBar);
+                await ExtractZipAsync(archivePath, destinationPath, progressBar);
             }
             else
             {
                 throw new NotSupportedException($"Unsupported archive format: {archivePath}");
             }
 
-            progressBar.Value = 0;
+            StopDotAnimation();
+            Dispatcher.UIThread.Post(() =>
+            {
+                progressBar.Value = 0;
+                progressBar.IsVisible = false;
+                if (_downloadButton != null)
+                {
+                    _downloadButton.IsVisible = true;
+                    _downloadButton.IsEnabled = true;
+                }
+                if (_statusText != null)
+                {
+                    _statusText.IsVisible = false;
+                }
+            });
+        }
+
+        private static void StartDotAnimation()
+        {
+            _dotTimer = new System.Timers.Timer(500);
+            _dotTimer.Elapsed += (s, e) =>
+            {
+                _dotCount = (_dotCount + 1) % 4;
+                var dots = new string('.', _dotCount);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (_statusText != null)
+                        _statusText.Text = $"Extracting{dots}";
+                });
+            };
+            _dotTimer.Start();
+        }
+
+        private static void StopDotAnimation()
+        {
+            _dotTimer?.Stop();
+            _dotTimer?.Dispose();
+            _dotTimer = null;
         }
 
         private static async Task ExtractTarGzAsync(string archivePath, string destinationPath, ProgressBar progressBar)
@@ -46,20 +106,26 @@ namespace GModContentWizard
                 await decompressionStream.CopyToAsync(decompressedFileStream);
             }
 
-            ExtractTar(tarFilePath, destinationPath, progressBar);
+            await ExtractTarAsync(tarFilePath, destinationPath, progressBar);
             File.Delete(tarFilePath);
         }
 
-        private static void ExtractTar(string tarFilePath, string destinationPath, ProgressBar progressBar)
+        private static async Task ExtractTarAsync(string tarFilePath, string destinationPath, ProgressBar progressBar)
         {
-            using var archive = TarArchive.Open(tarFilePath);
-            ExtractEntriesWithProgress(archive, destinationPath, progressBar);
+            await Task.Run(() =>
+            {
+                using var archive = TarArchive.Open(tarFilePath);
+                ExtractEntriesWithProgress(archive, destinationPath, progressBar);
+            });
         }
 
-        private static void ExtractZip(string zipFilePath, string destinationPath, ProgressBar progressBar)
+        private static async Task ExtractZipAsync(string zipFilePath, string destinationPath, ProgressBar progressBar)
         {
-            using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipFilePath);
-            ExtractEntriesWithProgress(archive, destinationPath, progressBar);
+            await Task.Run(() =>
+            {
+                using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipFilePath);
+                ExtractEntriesWithProgress(archive, destinationPath, progressBar);
+            });
         }
 
         private static void ExtractEntriesWithProgress(IArchive archive, string destinationPath, ProgressBar progressBar)
@@ -84,7 +150,16 @@ namespace GModContentWizard
         private static void SetProgress(ProgressBar progressBar, int extracted, int total)
         {
             int percentage = total > 0 ? (int)((double)extracted / total * 100) : 0;
-            progressBar.Value = percentage;
+            
+            Dispatcher.UIThread.Post(() =>
+            {
+                progressBar.Value = percentage;
+            });
+        }
+
+        public static async Task ExtractArchiveAsync(string archivePath, string destinationPath, ProgressBar progressBar)
+        {
+            await ExtractArchiveAsync(archivePath, destinationPath, progressBar, null, null);
         }
     }
 }

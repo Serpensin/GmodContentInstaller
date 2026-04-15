@@ -17,7 +17,8 @@
             <!-- Logo -->
             <Image Source="avares://GModContentWizard/Resources/Logo.png" 
                    Width="202" Height="137" HorizontalAlignment="Left"
-                   PointerPressed="Logo_Click" Cursor="Hand"/>
+                   PointerPressed="Logo_Click" Cursor="Hand"
+                   ToolTip.Tip="Open Discord"/>
             
             <!-- Separator -->
             <Rectangle Height="10" Fill="Black"/>
@@ -57,13 +58,15 @@
                     <ColumnDefinition Width="467"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" Background="#252324">
+                <Border Grid.Column="0" Background="#252324" Cursor="Hand" PointerPressed="PathShowLabel_Click">
                     <TextBlock x:Name="PathShowLabel" Text="GMod addons path" Foreground="White" FontSize="10"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               ToolTip.Tip="Click to open folder"/>
                 </Border>
                 <Button Grid.Column="1" x:Name="PathDetectButton" Content="Detect"
                         Width="194" Height="36" Background="Transparent" Foreground="LightGray"
                         BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Margin="10,0,0,0"
+                        HorizontalContentAlignment="Center"
                         Click="PathDetectButton_Click"/>
             </Grid>
 
@@ -148,12 +151,16 @@
 
             <!-- Bottom Controls -->
             <StackPanel Orientation="Horizontal" Margin="20,681,20,0" VerticalAlignment="Top" Spacing="10">
-                <Button x:Name="DownloadButton" Content="Download/Apply"
-                        Width="194" Height="36" Background="Transparent" Foreground="LightGray"
-                        BorderBrush="White" BorderThickness="1" IsEnabled="False"
-                        HorizontalContentAlignment="Center"
-                        Click="DownloadButton_Click"/>
-                <ProgressBar x:Name="ProgressBar" Width="194" Height="30" Minimum="0" Maximum="100"/>
+<Grid Width="194" Height="36">
+                    <ProgressBar x:Name="ProgressBar" Width="194" Height="36" Minimum="0" Maximum="100" IsVisible="False" CornerRadius="2" BorderThickness="0"/>
+                    <TextBlock x:Name="StatusText" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LightGray" FontSize="13" IsVisible="False"/>
+                    <Button x:Name="DownloadButton" Content="Download/Apply"
+                            Width="194" Height="36"
+                            Background="Transparent" Foreground="LightGray"
+                            BorderBrush="White" BorderThickness="1" IsEnabled="False"
+                            HorizontalContentAlignment="Center"
+                            Click="DownloadButton_Click"/>
+                </Grid>
                 <ProgressBar x:Name="DriveSpaceUsageBar" Width="194" Height="30" Minimum="0" Maximum="100"/>
             </StackPanel>
         </Grid>
