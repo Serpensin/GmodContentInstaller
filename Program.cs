@@ -22,7 +22,7 @@ namespace GModContentWizard
                 .MinimumLevel.Debug()
                 .WriteTo.File(logPath,
                     rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 7,
+                    retainedFileCountLimit: 2,
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
 
