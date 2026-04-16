@@ -47,19 +47,21 @@ namespace GModContentWizard
             
             // Versuche zuerst eingebettete Resource zu laden, dann Dateisystem
             var resourceName = "urls.json";
-            using var stream = assembly.GetManifestResourceStream(resourceName);
-            if (stream != null)
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "urls.json");
+            if (File.Exists(filePath))
             {
+                var json = File.ReadAllText(filePath);
+                LoadContentFromJson(json);
+                Log.Information("Loaded content from file: {Path}", filePath);
+            }
+            else
+            {
+                using var stream = assembly.GetManifestResourceStream(resourceName) 
+                    ?? throw new FileNotFoundException("Embedded resource urls.json not found");
                 using var reader = new StreamReader(stream);
                 var json = reader.ReadToEnd();
                 LoadContentFromJson(json);
                 Log.Information("Loaded content from embedded resource");
-            }
-            else
-            {
-                urlJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "urls.json");
-                InitializeContentInfo();
-                Log.Information("Loaded content from file: {Path}", urlJsonPath);
             }
             
             downloader = new Downloader(ProgressBar, DownloadButton, StatusText);
