@@ -23,6 +23,9 @@
                     <TextBlock x:Name="TitleText" Text="GMod Content Wizard" 
                                FontSize="16" FontWeight="SemiBold"
                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+                    <TextBlock x:Name="DescriptionText" Text="" 
+                               FontSize="10"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
                     <TextBlock x:Name="VersionText" Text="Version 1.0.0" 
                                FontSize="11"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
@@ -361,7 +364,7 @@
                         <TextBlock x:Name="StatusText" HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    IsVisible="False"/>
                         <Button x:Name="DownloadButton" Content="Download/Apply" HorizontalAlignment="Stretch"
-                                Click="DownloadButton_Click"/>
+                                Click="DownloadButton_Click" IsEnabled="False"/>
                     </Grid>
                 </StackPanel>
 
@@ -369,8 +372,8 @@
                 <Button Grid.Column="1" x:Name="LaunchGModButton" Content="Launch GMod" 
                         Click="LaunchGMod_Click" Margin="0,0,8,0"/>
 
-                <!-- Reset Size -->
-                <Button Grid.Column="2" Content="Reset Size" Click="ResetSize_Click" Margin="0,0,8,0"/>
+                <!-- Reset Window Size -->
+                <Button Grid.Column="2" Content="Reset Window Size" Click="ResetSize_Click" Margin="0,0,8,0"/>
 
                 <!-- Drive Space -->
                 <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="12">

@@ -39,6 +39,11 @@ namespace GModContentWizard
                 assembly, typeof(System.Reflection.AssemblyTitleAttribute));
             if (titleAttr != null && !string.IsNullOrEmpty(titleAttr.Title))
                 TitleText.Text = titleAttr.Title;
+
+            var descAttr = (System.Reflection.AssemblyDescriptionAttribute?)Attribute.GetCustomAttribute(
+                assembly, typeof(System.Reflection.AssemblyDescriptionAttribute));
+            if (descAttr != null && !string.IsNullOrEmpty(descAttr.Description))
+                DescriptionText.Text = descAttr.Description;
             
             // Versuche zuerst eingebettete Resource zu laden, dann Dateisystem
             var resourceName = "urls.json";
