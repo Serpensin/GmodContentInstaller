@@ -7,8 +7,8 @@ help:
 	@echo "  make run              - Run the application"
 	@echo "  make publish-linux    - Build Linux executable (native)"
 	@echo "  make publish-windows  - Build Windows executable"
-	@echo "  make publish-all      - Build both executables"
 	@echo "  make publish-appimage - Build Linux AppImage"
+	@echo "  make publish-all      - Build all versions (Linux + Windows)"
 	@echo "  make test-structure   - Create test structure for path detection"
 	@echo "  make test-clean       - Delete test structure"
 	@echo "  make clean            - Clean build files"
@@ -61,8 +61,9 @@ publish-appimage:
 
 # Windows single file self-contained
 publish-windows:
-publish-all: publish-linux publish-windows
+	dotnet publish -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist
 
+publish-all: publish-linux publish-windows publish-appimage
 # Teststruktur für Pfaderkennung erstellen
 test-structure:
 	@if [ "$(OS)" = "Windows_NT" ] || [ -n "$$WINDIR" ]; then \
