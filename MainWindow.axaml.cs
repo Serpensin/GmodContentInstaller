@@ -31,8 +31,16 @@ namespace GModContentWizard
         {
             InitializeComponent();
             
-            // Versuche zuerst eingebettete Resource zu laden, dann Dateisystem
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var version = assembly.GetName().Version?.ToString() ?? "1.0.0";
+            VersionText.Text = $"Version {version}";
+            
+            var titleAttr = (System.Reflection.AssemblyTitleAttribute?)Attribute.GetCustomAttribute(
+                assembly, typeof(System.Reflection.AssemblyTitleAttribute));
+            if (titleAttr != null && !string.IsNullOrEmpty(titleAttr.Title))
+                TitleText.Text = titleAttr.Title;
+            
+            // Versuche zuerst eingebettete Resource zu laden, dann Dateisystem
             var resourceName = "urls.json";
             using var stream = assembly.GetManifestResourceStream(resourceName);
             if (stream != null)
@@ -51,6 +59,31 @@ namespace GModContentWizard
             
             downloader = new Downloader(ProgressBar, DownloadButton, StatusText);
             driveUsageUpdater = new DriveUsageUpdater(DriveSpaceUsageBar);
+        }
+
+        private void LaunchGMod_Click(object? sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "steam://run/4000",
+                    UseShellExecute = true
+                });
+                Log.Information("Launched GMod via Steam");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to launch GMod");
+            }
+        }
+
+        private void ResetSize_Click(object? sender, RoutedEventArgs e)
+        {
+            Width = 1280;
+            Height = 800;
+            WindowState = WindowState.Normal;
+            Log.Information("Window size reset to 1280x800");
         }
 
         private void LoadContentFromJson(string json)

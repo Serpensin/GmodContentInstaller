@@ -1,168 +1,383 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:canvas="using:Avalonia.Media"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1228" d:DesignHeight="809"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
         x:Class="GModContentWizard.MainWindow"
-        Title="GarrysMod Content Installer"
-        Width="1228" Height="809"
-        Background="#252324"
-        WindowStartupLocation="CenterScreen"
-        CanResize="False">
+        Title="GMod Content Wizard"
+        Width="1280" Height="800"
+        MinWidth="1024" MinHeight="700"
+        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+        WindowStartupLocation="CenterScreen">
 
-    <Grid ColumnDefinitions="202,*">
-        <!-- Left Sidebar -->
-        <StackPanel Grid.Column="0">
-            <!-- Logo -->
-            <Image Source="avares://GModContentWizard/Resources/Logo.png" 
-                   Width="202" Height="137" HorizontalAlignment="Left"
-                   PointerPressed="Logo_Click" Cursor="Hand"
-                   ToolTip.Tip="Open Discord"/>
-            
-            <!-- Separator -->
-            <Rectangle Height="10" Fill="Black"/>
-            
-            <!-- Legend -->
-            <Border Background="#201D1E">
-                <StackPanel Margin="0,10,0,0">
-                    <TextBlock Text="Legend" Foreground="White" FontSize="15.75" 
-                               HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                    <StackPanel Orientation="Horizontal" Margin="12,0,0,10">
-                        <Border Width="30" Height="30" Background="Red" CornerRadius="15"/>
-                        <TextBlock Text="Not available" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="9"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="12,0,0,10">
-                        <Border Width="30" Height="30" Background="#7D8995" CornerRadius="15"/>
-                        <TextBlock Text="Available" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="9"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="12,0,0,10">
-                        <Border Width="30" Height="30" Background="Lime" CornerRadius="15"/>
-                        <TextBlock Text="Installed" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="9"/>
-                    </StackPanel>
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Title Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                Padding="16,8">
+            <Grid ColumnDefinitions="Auto,*">
+                <Image Source="avares://GModContentWizard/Resources/Logo.png" 
+                       Width="128" Height="128" Cursor="Hand"
+                       PointerPressed="Logo_Click" ToolTip.Tip="Open Discord"/>
+                
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0" Spacing="4">
+                    <TextBlock x:Name="TitleText" Text="GMod Content Wizard" 
+                               FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+                    <TextBlock x:Name="VersionText" Text="Version 1.0.0" 
+                               FontSize="11"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="220,*">
+            <!-- Left Sidebar -->
+            <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundAltMediumBrush}"
+                    Padding="12">
+                <StackPanel Spacing="16">
+                    <!-- Path Section -->
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Addons Path" FontSize="12" 
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                            <Border Background="{DynamicResource SystemControlBackgroundAltMediumBrush}" 
+                                    CornerRadius="4" Padding="8" Cursor="Hand"
+                                    PointerPressed="PathShowLabel_Click">
+                                <TextBlock x:Name="PathShowLabel" Text="Not detected" 
+                                           FontSize="11" TextWrapping="Wrap"
+                                           ToolTip.Tip="Click to open folder"/>
+                            </Border>
+                            <Button x:Name="PathDetectButton" Content="Detect" 
+                                    HorizontalAlignment="Stretch"
+                                    Click="PathDetectButton_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Legend -->
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="12">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Legend" FontSize="14" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Ellipse Width="16" Height="16" Fill="#FF4444"/>
+                                <TextBlock Text="Not available" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Ellipse Width="16" Height="16" Fill="#7D8995"/>
+                                <TextBlock Text="Available" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Ellipse Width="16" Height="16" Fill="#44FF44"/>
+                                <TextBlock Text="Installed" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    
                 </StackPanel>
             </Border>
-        </StackPanel>
 
-        <!-- Right Content -->
-        <Grid Grid.Column="1">
-            <!-- Navbar -->
-            <Border Background="#201D1E" Height="63" VerticalAlignment="Top">
-                <TextBlock Text="GMod Content Wizard" FontSize="18" Foreground="White" 
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
+            <!-- Content Area -->
+            <ScrollViewer Grid.Column="1" Padding="16,16,16,56" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="12">
+                    <!-- Game Cards -->
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/css.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Counter-Strike: Source" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="CSSLabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="CSSLabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="CSSButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="CSSButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-            <!-- Path Bar -->
-            <Grid Margin="20,81,20,0" VerticalAlignment="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="467"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" Background="#252324" Cursor="Hand" PointerPressed="PathShowLabel_Click">
-                    <TextBlock x:Name="PathShowLabel" Text="GMod addons path" Foreground="White" FontSize="10"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                               ToolTip.Tip="Click to open folder"/>
-                </Border>
-                <Button Grid.Column="1" x:Name="PathDetectButton" Content="Detect"
-                        Width="194" Height="36" Background="Transparent" Foreground="LightGray"
-                        BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Margin="10,0,0,0"
-                        HorizontalContentAlignment="Center"
-                        Click="PathDetectButton_Click"/>
-            </Grid>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/dod.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Day of Defeat" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="DODLabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="DODLabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="DODButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="DODButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-            <!-- Canvas Content -->
-            <Canvas Margin="0,137,0,0">
-                <!-- CSS -->
-                <Image Source="avares://GModContentWizard/Resources/css.png" Width="80" Height="80" Canvas.Left="0" Canvas.Top="0"/>
-                <TextBlock x:Name="CSSLabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="12"/>
-                <ToggleSwitch x:Name="CSSButtonContent" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="12" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="CSSLabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="43"/>
-                <ToggleSwitch x:Name="CSSButtonMaps" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="43" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/hl1.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Half-Life" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL1LabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL1LabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="HL1ButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="HL1ButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- DOD -->
-                <Image Source="avares://GModContentWizard/Resources/dod.png" Width="80" Height="80" Canvas.Left="0" Canvas.Top="86"/>
-                <TextBlock x:Name="DODLabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="98"/>
-                <ToggleSwitch x:Name="DODButtonContent" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="98" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="DODLabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="129"/>
-                <ToggleSwitch x:Name="DODButtonMaps" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="129" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/hl2e1.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Half-Life 2: Episode 1" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL2Ep1LabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL2Ep1LabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="HL2Ep1ButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="HL2Ep1ButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- HL1 -->
-                <Image Source="avares://GModContentWizard/Resources/hl1.png" Width="80" Height="80" Canvas.Left="0" Canvas.Top="172"/>
-                <TextBlock x:Name="HL1LabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="184"/>
-                <ToggleSwitch x:Name="HL1ButtonContent" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="184" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="HL1LabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="215"/>
-                <ToggleSwitch x:Name="HL1ButtonMaps" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="215" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/hl2e2.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Half-Life 2: Episode 2" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL2Ep2LabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL2Ep2LabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="HL2Ep2ButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="HL2Ep2ButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- HL2Ep1 -->
-                <Image Source="avares://GModContentWizard/Resources/hl2e1.png" Width="80" Height="80" Canvas.Left="0" Canvas.Top="259"/>
-                <TextBlock x:Name="HL2Ep1LabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="271"/>
-                <ToggleSwitch x:Name="HL2Ep1ButtonContent" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="271" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="HL2Ep1LabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="302"/>
-                <ToggleSwitch x:Name="HL2Ep1ButtonMaps" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="302" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/hl2e.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Half-Life 2 Extras" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL2ExtrasLabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="HL2ExtrasLabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="HL2ExtrasButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="HL2ExtrasButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- HL2Ep2 -->
-                <Image Source="avares://GModContentWizard/Resources/hl2e2.png" Width="80" Height="80" Canvas.Left="0" Canvas.Top="345"/>
-                <TextBlock x:Name="HL2Ep2LabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="357"/>
-                <ToggleSwitch x:Name="HL2Ep2ButtonContent" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="357" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="HL2Ep2LabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="388"/>
-                <ToggleSwitch x:Name="HL2Ep2ButtonMaps" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="388" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/portal.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Portal" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="PortalLabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="PortalLabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="PortalButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="PortalButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- HL2Extras -->
-                <Image Source="avares://GModContentWizard/Resources/hl2e.png" Width="80" Height="80" Canvas.Left="0" Canvas.Top="431"/>
-                <TextBlock x:Name="HL2ExtrasLabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="443"/>
-                <ToggleSwitch x:Name="HL2ExtrasButtonContent" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="443" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="HL2ExtrasLabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="87" Canvas.Top="474"/>
-                <ToggleSwitch x:Name="HL2ExtrasButtonMaps" OnContent="" OffContent="" Canvas.Left="422" Canvas.Top="474" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/portal2.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Portal 2" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="Portal2LabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="Portal2LabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="Portal2ButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="Portal2ButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- Right Column -->
-                <!-- Portal -->
-                <Image Source="avares://GModContentWizard/Resources/portal.png" Width="80" Height="80" Canvas.Left="510" Canvas.Top="0"/>
-                <TextBlock x:Name="PortalLabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="12"/>
-                <ToggleSwitch x:Name="PortalButtonContent" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="12" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="PortalLabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="43"/>
-                <ToggleSwitch x:Name="PortalButtonMaps" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="43" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/tf2.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Team Fortress 2" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="TF2LabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="TF2LabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="TF2ButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="TF2ButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- Portal2 -->
-                <Image Source="avares://GModContentWizard/Resources/portal2.png" Width="80" Height="80" Canvas.Left="510" Canvas.Top="86"/>
-                <TextBlock x:Name="Portal2LabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="98"/>
-                <ToggleSwitch x:Name="Portal2ButtonContent" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="98" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="Portal2LabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="129"/>
-                <ToggleSwitch x:Name="Portal2ButtonMaps" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="129" IsEnabled="False" Click="ContentToggle_Click"/>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/l4d1.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Left 4 Dead" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="L4DLabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="L4DLabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="L4DButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="L4DButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!-- TF2 -->
-                <Image Source="avares://GModContentWizard/Resources/tf2.png" Width="80" Height="80" Canvas.Left="510" Canvas.Top="172"/>
-                <TextBlock x:Name="TF2LabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="184"/>
-                <ToggleSwitch x:Name="TF2ButtonContent" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="184" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="TF2LabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="215"/>
-                <ToggleSwitch x:Name="TF2ButtonMaps" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="215" IsEnabled="False" Click="ContentToggle_Click"/>
-
-                <!-- L4D -->
-                <Image Source="avares://GModContentWizard/Resources/l4d1.png" Width="80" Height="80" Canvas.Left="510" Canvas.Top="259"/>
-                <TextBlock x:Name="L4DLabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="271"/>
-                <ToggleSwitch x:Name="L4DButtonContent" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="271" IsEnabled="False" Click="ContentToggle_Click"/>
-                <TextBlock x:Name="L4DLabelMaps" Text="Maps" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="302"/>
-                <ToggleSwitch x:Name="L4DButtonMaps" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="302" IsEnabled="False" Click="ContentToggle_Click"/>
-
-                <!-- L4D2 -->
-                <Image Source="avares://GModContentWizard/Resources/l4d2.png" Width="80" Height="80" Canvas.Left="510" Canvas.Top="345"/>
-                <TextBlock x:Name="L4D2LabelContent" Text="Content" FontSize="15.75" Foreground="White" Canvas.Left="597" Canvas.Top="357"/>
-                <ToggleSwitch x:Name="L4D2ButtonContent" OnContent="" OffContent="" Canvas.Left="932" Canvas.Top="357" IsEnabled="False" Click="ContentToggle_Click"/>
-            </Canvas>
-
-            <!-- Bottom Controls -->
-            <StackPanel Orientation="Horizontal" Margin="20,681,20,0" VerticalAlignment="Top" Spacing="10">
-<Grid Width="194" Height="36">
-                    <ProgressBar x:Name="ProgressBar" Width="194" Height="36" Minimum="0" Maximum="100" IsVisible="False" CornerRadius="2" BorderThickness="0"/>
-                    <TextBlock x:Name="StatusText" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LightGray" FontSize="13" IsVisible="False"/>
-                    <Button x:Name="DownloadButton" Content="Download/Apply"
-                            Width="194" Height="36"
-                            Background="Transparent" Foreground="LightGray"
-                            BorderBrush="White" BorderThickness="1" IsEnabled="False"
-                            HorizontalContentAlignment="Center"
-                            Click="DownloadButton_Click"/>
-                </Grid>
-                <ProgressBar x:Name="DriveSpaceUsageBar" Width="194" Height="30" Minimum="0" Maximum="100"/>
-            </StackPanel>
+                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" 
+                            CornerRadius="8" Padding="16">
+                        <Grid ColumnDefinitions="80,*,Auto">
+                            <Image Source="avares://GModContentWizard/Resources/l4d2.png" Width="64" Height="64"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                <TextBlock Text="Left 4 Dead 2" FontSize="16" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Content:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="L4D2LabelContent" Text="Not available"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Maps:" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                        <TextBlock x:Name="L4D2LabelMaps" Text="Not available"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <ToggleSwitch x:Name="L4D2ButtonContent" IsEnabled="False" Click="ContentToggle_Click"/>
+                                <ToggleSwitch x:Name="L4D2ButtonMaps" IsEnabled="False" Click="ContentToggle_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2" Background="{DynamicResource SystemControlBackgroundAltMediumBrush}" 
+                Padding="16,12">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <!-- Progress Section -->
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Grid Width="180" Height="32">
+                        <ProgressBar x:Name="ProgressBar" Minimum="0" Maximum="100" IsVisible="False"/>
+                        <TextBlock x:Name="StatusText" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   IsVisible="False"/>
+                        <Button x:Name="DownloadButton" Content="Download/Apply" HorizontalAlignment="Stretch"
+                                Click="DownloadButton_Click"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Launch GMod -->
+                <Button Grid.Column="1" x:Name="LaunchGModButton" Content="Launch GMod" 
+                        Click="LaunchGMod_Click" Margin="0,0,8,0"/>
+
+                <!-- Reset Size -->
+                <Button Grid.Column="2" Content="Reset Size" Click="ResetSize_Click" Margin="0,0,8,0"/>
+
+                <!-- Drive Space -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="Disk:" VerticalAlignment="Center"/>
+                    <ProgressBar x:Name="DriveSpaceUsageBar" Width="150" Height="20" Minimum="0" Maximum="100"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
