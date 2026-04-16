@@ -401,6 +401,7 @@ namespace GModContentWizard
             isOperationRunning = true;
             DownloadButton.IsEnabled = false;
             PathDetectButton.IsEnabled = false;
+            LaunchGModButton.IsEnabled = false;
 
             try
             {
@@ -411,6 +412,7 @@ namespace GModContentWizard
                 isOperationRunning = false;
                 DownloadButton.IsEnabled = true;
                 PathDetectButton.IsEnabled = true;
+                LaunchGModButton.IsEnabled = true;
                 driveUsageUpdater?.SetDriveLetter(addonsPath);
                 driveUsageUpdater?.UpdateDriveSizeBar();
             }
