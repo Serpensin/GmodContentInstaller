@@ -45,7 +45,6 @@ namespace GModContentWizard
         /// <param name="inputChange">The cumulative size change from all toggles.</param>
         public void UpdateDriveSizeBar(long inputChange = 0)
         {
-            // inputChange is now the total cumulative change from all switches, not incremental
             cumulativeChange = inputChange;
 
             if (string.IsNullOrEmpty(driveLetter))
@@ -107,6 +106,23 @@ namespace GModContentWizard
         }
 
         /// <summary>
+        /// Formats a byte count into a human-readable string.
+        /// </summary>
+        /// <param name="size">The size in bytes.</param>
+        /// <returns>A formatted string representation.</returns>
+        public static string FormatSize(double size)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB", "PB" };
+            int order = 0;
+            while (size >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                size = size / 1024;
+            }
+            return $"{size:0.##} {sizes[order]}";
+        }
+
+        /// <summary>
         /// Gets the mount point for a given path.
         /// </summary>
         /// <param name="path">The path to find the mount point for.</param>
@@ -117,15 +133,11 @@ namespace GModContentWizard
                 return "/";
 
             if (Directory.Exists(path))
-            {
                 return path;
-            }
 
             var parent = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(parent) && parent != path)
-            {
                 return GetLinuxMountPoint(parent);
-            }
 
             return "/";
         }
@@ -178,18 +190,6 @@ namespace GModContentWizard
                 Log.Error(ex, "Error running df command");
                 return null;
             }
-        }
-
-        public static string FormatSize(double size)
-        {
-            string[] sizes = { "B", "KB", "MB", "GB", "TB", "PB" };
-            int order = 0;
-            while (size >= 1024 && order < sizes.Length - 1)
-            {
-                order++;
-                size = size / 1024;
-            }
-            return $"{size:0.##} {sizes[order]}";
         }
     }
 }

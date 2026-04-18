@@ -84,6 +84,14 @@ namespace GModContentWizard
         }
 
         /// <summary>
+        /// Extracts an archive with default null parameters.
+        /// </summary>
+        public static async Task ExtractArchiveAsync(string archivePath, string destinationPath, ProgressBar progressBar)
+        {
+            await ExtractArchiveAsync(archivePath, destinationPath, progressBar, null, null);
+        }
+
+        /// <summary>
         /// Starts the animated dot display during extraction.
         /// </summary>
         private static void StartDotAnimation()
@@ -165,7 +173,7 @@ namespace GModContentWizard
 
             foreach (var entry in entries)
             {
-                entry.WriteToDirectory(destinationPath, new SharpCompress.Common.ExtractionOptions
+                entry.WriteToDirectory(destinationPath, new ExtractionOptions
                 {
                     ExtractFullPath = true,
                     Overwrite = true
@@ -187,11 +195,6 @@ namespace GModContentWizard
             {
                 progressBar.Value = percentage;
             });
-        }
-
-        public static async Task ExtractArchiveAsync(string archivePath, string destinationPath, ProgressBar progressBar)
-        {
-            await ExtractArchiveAsync(archivePath, destinationPath, progressBar, null, null);
         }
     }
 }

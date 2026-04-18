@@ -77,6 +77,14 @@ namespace GModContentWizard
         }
 
         /// <summary>
+        /// Cancels the current download operation.
+        /// </summary>
+        public void Cancel()
+        {
+            _cancellationTokenSource?.Cancel();
+        }
+
+        /// <summary>
         /// Starts an animated dot display to indicate ongoing download.
         /// </summary>
         private void StartDotAnimation()
@@ -102,14 +110,6 @@ namespace GModContentWizard
             _dotTimer?.Stop();
             _dotTimer?.Dispose();
             _dotTimer = null;
-        }
-
-        /// <summary>
-        /// Cancels the current download operation.
-        /// </summary>
-        public void Cancel()
-        {
-            _cancellationTokenSource?.Cancel();
         }
     }
 }
