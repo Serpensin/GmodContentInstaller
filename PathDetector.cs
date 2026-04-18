@@ -8,6 +8,9 @@ using Serilog;
 
 namespace GModContentWizard
 {
+    /// <summary>
+    /// Detects and locates the Garry's Mod addons directory on Windows and Linux systems.
+    /// </summary>
     internal static class PathDetector
     {
         private static readonly string[] SearchPaths =
@@ -16,6 +19,10 @@ namespace GModContentWizard
             @"Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons"
         ];
 
+        /// <summary>
+        /// Attempts to automatically detect the Garry's Mod addons directory.
+        /// </summary>
+        /// <returns>The path to the addons directory if found, otherwise null.</returns>
         public static string? Select()
         {
             Log.Information("PathDetector.Select() called");
@@ -30,6 +37,10 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Searches for Garry's Mod addons directory on Windows systems.
+        /// </summary>
+        /// <returns>The addons path if found, otherwise null.</returns>
         private static string? SelectWindows()
         {
             Log.Information("Searching for Garry's Mod on Windows");
@@ -55,6 +66,10 @@ namespace GModContentWizard
             return null;
         }
 
+        /// <summary>
+        /// Searches for Garry's Mod addons directory on Linux systems using find.
+        /// </summary>
+        /// <returns>The addons path if found, otherwise null.</returns>
         private static string? SelectLinux()
         {
             Log.Information("Searching for Garry's Mod on Linux");
@@ -69,6 +84,10 @@ namespace GModContentWizard
             return null;
         }
 
+        /// <summary>
+        /// Uses the find command to locate hl2_linux binary and derive the addons path.
+        /// </summary>
+        /// <returns>The addons path if found, otherwise null.</returns>
         private static string? SearchLinux()
         {
             try
@@ -134,6 +153,11 @@ namespace GModContentWizard
             return null;
         }
 
+        /// <summary>
+        /// Verifies if the given path contains the Garry's Mod hl2 binary.
+        /// </summary>
+        /// <param name="hl2Path">Path to the hl2_linux binary.</param>
+        /// <returns>True if it's Garry's Mod, otherwise false.</returns>
         private static bool IsGarrysModHL2(string hl2Path)
         {
             try
@@ -149,6 +173,11 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Validates that a path is a valid Garry's Mod installation by checking for garrysmod folder and steam_appid.txt.
+        /// </summary>
+        /// <param name="rootPath">The potential GMod root directory.</param>
+        /// <returns>True if valid, otherwise false.</returns>
         private static bool IsValidGModPath(string rootPath)
         {
             try
@@ -178,6 +207,11 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Opens a folder picker dialog to manually select the Garry's Mod addons directory.
+        /// </summary>
+        /// <param name="window">The parent window for the dialog.</param>
+        /// <returns>The selected addons path, or null if cancelled/invalid.</returns>
         public static async Task<string?> SelectWithDialog(Window window)
         {
             var topLevel = TopLevel.GetTopLevel(window);

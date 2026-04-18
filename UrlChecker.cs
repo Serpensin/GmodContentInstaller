@@ -3,6 +3,9 @@ using Serilog;
 
 namespace GModContentWizard
 {
+    /// <summary>
+    /// Provides functionality to check if URLs are reachable and valid for downloading.
+    /// </summary>
     internal static class UrlChecker
     {
         private static readonly HttpClient client = new();
@@ -12,6 +15,11 @@ namespace GModContentWizard
             client.Timeout = TimeSpan.FromSeconds(10);
         }
 
+        /// <summary>
+        /// Checks if the given URL is reachable and has a valid content type for downloading.
+        /// </summary>
+        /// <param name="url">The URL to check.</param>
+        /// <returns>True if the URL is reachable and has a valid content type (application/gzip or application/zip), otherwise false.</returns>
         public static async Task<bool> IsUrlReachableAsync(string? url)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -54,6 +62,11 @@ namespace GModContentWizard
             return false;
         }
 
+        /// <summary>
+        /// Checks if the content type is valid for hotlinking (gzip or zip).
+        /// </summary>
+        /// <param name="contentType">The content type to check.</param>
+        /// <returns>True if valid, otherwise false.</returns>
         private static bool IsValidHotlinkContentType(string contentType)
         {
             Log.Debug("Checking valid hotlink content type: {ContentType}", contentType);

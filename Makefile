@@ -1,17 +1,20 @@
-.PHONY: all run clean publish-linux publish-windows publish-all publish-appimage test-structure test-clean help
+.PHONY: all run clean publish-linux publish-linux-sc publish-windows publish-windows-sc publish-all publish-appimage check-appdir test-structure test-clean help generate-profiles
 
 help:
 	@echo "GMod Content Wizard - Makefile"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  make run              - Run the application"
-	@echo "  make publish-linux    - Build Linux executable (native)"
-	@echo "  make publish-windows  - Build Windows executable"
-	@echo "  make publish-appimage - Build Linux AppImage"
-	@echo "  make publish-all      - Build all versions (Linux + Windows)"
-	@echo "  make test-structure   - Create test structure for path detection"
-	@echo "  make test-clean       - Delete test structure"
-	@echo "  make clean            - Clean build files"
+	@echo "  make run                - Run the application"
+	@echo "  make publish-linux      - Build Linux framework-dependent single file"
+	@echo "  make publish-linux-sc   - Build Linux self-contained single file"
+	@echo "  make publish-windows    - Build Windows framework-dependent single file"
+	@echo "  make publish-windows-sc - Build Windows self-contained single file"
+	@echo "  make publish-appimage   - Build Linux AppImage"
+	@echo "  make check-appdir       - Check AppImage using appdir-lint.sh"
+	@echo "  make publish-all        - Build all versions (Linux + Windows + AppImage)"
+	@echo "  make test-structure     - Create test structure for path detection"
+	@echo "  make test-clean         - Delete test structure"
+	@echo "  make clean              - Clean build files"
 	@echo ""
 	@echo "Default target: help"
 
@@ -20,14 +23,29 @@ all: help
 run:
 	dotnet run
 
-# Linux single file self-contained
 publish-linux:
-	dotnet publish -c Release -r linux-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist
-	mv dist/GModContentWizard dist/GModContentWizard.run
+	@mkdir -p dist
+	dotnet publish -c Release -r linux-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
+	@cp ./dist-temp/GModContentWizard ./dist/GModContentWizard.run
+	@chmod +x ./dist/GModContentWizard.run
+	@rm -rf ./dist-temp
 
-# Linux AppImage
-publish-appimage:
-	@echo "Building AppImage for Linux..."
+publish-linux-sc:
+	@mkdir -p dist
+	dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
+	@cp ./dist-temp/GModContentWizard ./dist/GModContentWizard-sc.run
+	@chmod +x ./dist/GModContentWizard-sc.run
+	@rm -rf ./dist-temp
+
+publish-appimage: check-appdir
+	@VERSION=$$(grep AssemblyFileVersion AssemblyInfo.cs | sed 's/.*"\([^"]*\)".*/\1/' | cut -d'.' -f1-3); \
+	echo "Packaging AppImage..."; \
+	appimagetool ./dist/AppImage ./dist/GMod-Content-Wizard-$${VERSION}-x86_64.AppImage; \
+	rm -rf ./dist/AppImage; \
+	echo "Done: dist/GMod-Content-Wizard-$${VERSION}-x86_64.AppImage"
+
+check-appdir:
+	@echo "Building AppImage for checking..."
 	@if ! command -v appimagetool &> /dev/null; then \
 		echo "Error: appimagetool not found in PATH"; \
 		echo "Please install appimagetool first: https://github.com/AppImage/appimagetool"; \
@@ -35,7 +53,7 @@ publish-appimage:
 	fi
 	@rm -rf ./dist/AppImage
 	@mkdir -p ./dist/AppImage/usr/bin
-	dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./dist/AppImage/usr/bin
+	dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:InvariantGlobalization=true -o ./dist/AppImage/usr/bin
 	mv ./dist/AppImage/usr/bin/GModContentWizard ./dist/AppImage/usr/bin/GModContentWizard.bin
 	@echo '#!/bin/bash' > ./dist/AppImage/AppRun
 	@echo 'exec "$$(dirname "$$0")/usr/bin/GModContentWizard.bin" "$$@"' >> ./dist/AppImage/AppRun
@@ -55,16 +73,38 @@ publish-appimage:
 	fi
 	@mkdir -p ./dist/AppImage/usr/share/applications
 	@cp ./dist/AppImage/gmod-content-wizard.desktop ./dist/AppImage/usr/share/applications/
-	@appimagetool ./dist/AppImage ./dist/GModContentWizard.AppImage
-	@rm -rf ./dist/AppImage
-	@echo "Done: dist/GModContentWizard.AppImage"
+	@if [ -f Resources/Logo.png ]; then \
+		cp Resources/Logo.png ./dist/AppImage/.DirIcon; \
+	fi
+	@echo "Fetching appdir-lint.sh..."
+	@curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/appdir-lint.sh -o ./appdir-lint.sh
+	@chmod +x ./appdir-lint.sh
+	@echo "Fetching excludelist..."
+	@curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/excludelist -o ./excludelist
+	@echo "Running appdir-lint.sh on ./dist/AppImage..."
+	@./appdir-lint.sh ./dist/AppImage
+	@CHECK_EXIT=$$?; \
+	rm -f ./appdir-lint.sh ./excludelist; \
+	if [ $$CHECK_EXIT -ne 0 ]; then \
+		echo "Error: appdir-lint.sh check failed"; \
+		exit 1; \
+	fi
+	@echo "AppImage check passed (AppImage directory kept for packaging)"
 
-# Windows single file self-contained
 publish-windows:
-	dotnet publish -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist
+	@mkdir -p dist
+	dotnet publish -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
+	@cp ./dist-temp/GModContentWizard.exe ./dist/GModContentWizard.exe
+	@rm -rf ./dist-temp
 
-publish-all: publish-linux publish-windows publish-appimage
-# Teststruktur für Pfaderkennung erstellen
+publish-windows-sc:
+	@mkdir -p dist
+	dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
+	@cp ./dist-temp/GModContentWizard.exe ./dist/GModContentWizard-sc.exe
+	@rm -rf ./dist-temp
+
+publish-all: publish-linux publish-linux-sc publish-windows publish-windows-sc publish-appimage
+
 test-structure:
 	@if [ "$(OS)" = "Windows_NT" ] || [ -n "$$WINDIR" ]; then \
 		echo "Erstelle Test-Struktur (Windows)..."; \
@@ -90,7 +130,6 @@ test-structure:
 		echo "  steamapps/common/GarrysMod/garrysmod/gamemodes/"; \
 	fi
 
-# Test-Struktur löschen
 test-clean:
 	@if [ "$(OS)" = "Windows_NT" ] || [ -n "$$WINDIR" ]; then \
 		echo "Lösche Test-Struktur (Windows)..."; \
@@ -104,4 +143,4 @@ test-clean:
 
 clean:
 	dotnet clean
-	rm -rf bin obj dist
+	rm -rf bin obj dist dist-temp packages

@@ -5,8 +5,15 @@ using System.IO;
 
 namespace GModContentWizard
 {
+    /// <summary>
+    /// Main entry point for the GMod Content Wizard application.
+    /// </summary>
     class Program
     {
+        /// <summary>
+        /// Application entry point with logging and exception handling.
+        /// </summary>
+        /// <param name="args">Command line arguments.</param>
         [STAThread]
         public static void Main(string[] args)
         {
@@ -42,6 +49,10 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Creates and configures the Avalonia application builder.
+        /// </summary>
+        /// <returns>The configured AppBuilder instance.</returns>
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()

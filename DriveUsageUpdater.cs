@@ -7,6 +7,10 @@ using Serilog;
 
 namespace GModContentWizard
 {
+    /// <summary>
+    /// Handles updating the drive usage progress bar and calculating available disk space.
+    /// Supports both Windows (DriveInfo) and Linux (df command) systems.
+    /// </summary>
     internal class DriveUsageUpdater
     {
         private string? driveLetter;
@@ -24,6 +28,10 @@ namespace GModContentWizard
             this.progressBar = progressBar;
         }
 
+        /// <summary>
+        /// Sets the drive letter/path for which to calculate usage.
+        /// </summary>
+        /// <param name="letter">The drive letter (Windows) or path (Linux).</param>
         public void SetDriveLetter(string? letter)
         {
             cumulativeChange = 0;
@@ -31,6 +39,10 @@ namespace GModContentWizard
             Log.Information("DriveLetter set to: {Drive}", driveLetter);
         }
 
+        /// <summary>
+        /// Updates the drive usage progress bar with cumulative change applied.
+        /// </summary>
+        /// <param name="inputChange">The cumulative size change from all toggles.</param>
         public void UpdateDriveSizeBar(long inputChange = 0)
         {
             // inputChange is now the total cumulative change from all switches, not incremental
@@ -94,6 +106,11 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Gets the mount point for a given path.
+        /// </summary>
+        /// <param name="path">The path to find the mount point for.</param>
+        /// <returns>The mount point path.</returns>
         private string GetLinuxMountPoint(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -113,6 +130,11 @@ namespace GModContentWizard
             return "/";
         }
 
+        /// <summary>
+        /// Gets the disk usage for a Linux mount point using the df command.
+        /// </summary>
+        /// <param name="mountPoint">The mount point to query.</param>
+        /// <returns>A tuple of (total, available) bytes, or null if parsing fails.</returns>
         private (double total, double available)? GetLinuxDiskUsage(string mountPoint)
         {
             try

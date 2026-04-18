@@ -3,6 +3,9 @@ using Avalonia.Threading;
 
 namespace GModContentWizard
 {
+    /// <summary>
+    /// Handles downloading files from URLs with progress reporting and cancellation support.
+    /// </summary>
     internal class Downloader(ProgressBar progressBar, Button downloadButton, TextBlock statusText)
     {
         private readonly ProgressBar _progressBar = progressBar;
@@ -12,6 +15,12 @@ namespace GModContentWizard
         private int _dotCount = 0;
         private System.Timers.Timer? _dotTimer;
 
+        /// <summary>
+        /// Downloads a file from the specified URL to the temp path.
+        /// </summary>
+        /// <param name="url">The URL to download from.</param>
+        /// <param name="fileName">The name of the file to save as.</param>
+        /// <param name="tempPath">The directory to save the file in.</param>
         public async Task DownloadFileAsync(string url, string fileName, string tempPath)
         {
             _cancellationTokenSource = new CancellationTokenSource();
@@ -67,6 +76,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Starts an animated dot display to indicate ongoing download.
+        /// </summary>
         private void StartDotAnimation()
         {
             _dotTimer = new System.Timers.Timer(500);
@@ -82,6 +94,9 @@ namespace GModContentWizard
             _dotTimer.Start();
         }
 
+        /// <summary>
+        /// Stops the dot animation timer.
+        /// </summary>
         private void StopDotAnimation()
         {
             _dotTimer?.Stop();
@@ -89,6 +104,9 @@ namespace GModContentWizard
             _dotTimer = null;
         }
 
+        /// <summary>
+        /// Cancels the current download operation.
+        /// </summary>
         public void Cancel()
         {
             _cancellationTokenSource?.Cancel();
