@@ -59,16 +59,16 @@ check-appdir:
 	@chmod +x ./dist/AppImage/AppRun
 	@mkdir -p ./dist/AppImage/usr/share/icons/hicolor/256x256/apps
 	@if [ -f Resources/Icon.png ]; then \
-		cp Resources/Icon.png ./dist/AppImage/gmod-content-wizard.png; \
-		cp Resources/Icon.png ./dist/AppImage/usr/share/icons/hicolor/256x256/apps/gmod-content-wizard.png; \
+cp Resources/Icon.png ./dist/AppImage/com.serpensin.gmodcontentwizard.png; \
+cp Resources/Icon.png ./dist/AppImage/usr/share/icons/hicolor/256x256/apps/com.serpensin.gmodcontentwizard.png; \
 		cp Resources/Icon.png ./dist/AppImage/.DirIcon; \
 	fi
 	@mkdir -p ./dist/AppImage/usr/share/applications
-	@cp Resources/AppImage/com.gmodcontentwizard.desktop ./dist/AppImage/com.gmodcontentwizard.desktop
-	@cp ./dist/AppImage/com.gmodcontentwizard.desktop ./dist/AppImage/usr/share/applications/
+	@cp Resources/AppImage/com.serpensin.gmodcontentwizard.desktop ./dist/AppImage/com.serpensin.gmodcontentwizard.desktop
+	@cp ./dist/AppImage/com.serpensin.gmodcontentwizard.desktop ./dist/AppImage/usr/share/applications/
 	@mkdir -p ./dist/AppImage/usr/share/metainfo
 	@VERSION=$$(grep AssemblyFileVersion AssemblyInfo.cs | sed 's/.*"\([^"]*\)".*/\1/' | cut -d'.' -f1-3); \
-	sed -e "s/\[\[VERSION\]\]/$$VERSION/g" -e "s/\[\[DATE\]\]/$$(date +%Y-%m-%d)/g" Resources/AppImage/appdata.xml > ./dist/AppImage/usr/share/metainfo/com.gmodcontentwizard.appdata.xml
+	sed -e "s/\[\[VERSION\]\]/$$VERSION/g" -e "s/\[\[DATE\]\]/$$(date +%Y-%m-%d)/g" Resources/AppImage/com.serpensin.gmodcontentwizard.appdata.xml > ./dist/AppImage/usr/share/metainfo/com.serpensin.gmodcontentwizard.appdata.xml
 	@echo "Fetching appdir-lint.sh..."
 	@curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/appdir-lint.sh -o ./appdir-lint.sh
 	@chmod +x ./appdir-lint.sh

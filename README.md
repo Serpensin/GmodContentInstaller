@@ -2,12 +2,19 @@
 
 A desktop application for simplifying the installation of Garry's Mod content (maps, models, textures).
 
+## Screenshots
+
+| Light Theme | Dark Theme |
+|-------------|------------|
+| ![Light](https://cdn.serpensin.com/gmodcontentwizard/Light.png) | ![Dark](https://cdn.serpensin.com/gmodcontentwizard/Dark.png) |
+
 ## Features
 
 - **Automatic Detection**: Automatically locates your Garry's Mod addons folder on Windows and Linux
 - **Server Selection**: Tests both primary and secondary servers and selects the one with lower ping
 - **Drive Usage**: Real-time display of available disk space with cumulative size preview
 - **Smart Toggle**: Shows installation status, download size vs installed size, and enables/disables content based on server reachability
+- **System Theme**: Automatically adapts to your system's light/dark theme preference
 - **Cross-Platform**: Supports both Windows and Linux
 
 ## Supported Content
