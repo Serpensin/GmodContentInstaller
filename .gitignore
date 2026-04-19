@@ -368,3 +368,4 @@ disttemp/
 packages/
 GModContentWizard.sln
 Properties/
+appdir-lint.sh

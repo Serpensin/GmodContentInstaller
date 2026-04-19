@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>com.gmodcontentwizard.desktop</id>
+  <version>[[VERSION]]</version>
+  <name>GMod Content Wizard</name>
+  <summary>Install Garry's Mod content like maps and models</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>GMod Content Wizard simplifies installing Garry's Mod content.</p>
+    <p>Features: automatic addons folder detection, server selection by ping, drive usage display, smart toggle.</p>
+  </description>
+  <launchable type="desktop-id">com.gmodcontentwizard.desktop</launchable>
+  <developer_name>Serpensin</developer_name>
+  <url type="homepage">https://github.com/Serpensin/GmodContentInstaller</url>
+  <provides>
+    <binary>GModContentWizard</binary>
+  </provides>
+  <releases>
+    <release version="[[VERSION]]" date="[[DATE]]">
+      <description><p>Initial release</p></description>
+    </release>
+  </releases>
+</component>
