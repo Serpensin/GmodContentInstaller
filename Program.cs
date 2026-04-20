@@ -6,7 +6,7 @@ using System.IO;
 namespace GModContentWizard
 {
     /// <summary>
-    /// Main entry point for the GMod Content Wizard application.
+    /// Main entry point for the GModContentWizard application.
     /// </summary>
     class Program
     {

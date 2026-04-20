@@ -2,9 +2,9 @@
 Name=GMod Content Wizard
 GenericName=Content installer for Garry's Mod
 Comment=Install Garry's Mod content like maps and models
-Exec=GModContentWizard.bin
+Exec=GmodContentInstaller
 Type=Application
 Categories=Utility;
 Terminal=false
-Icon=com.serpensin.gmodcontentwizard
+Icon=com.serpensin.gmodcontentinstaller
 Keywords=gmod;garry;mod;maps;content;download;installer;

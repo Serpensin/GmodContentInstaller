@@ -1,6 +1,6 @@
 using System.Reflection;
 
-[assembly: AssemblyTitle("GMod Content Wizard")]
+[assembly: AssemblyTitle("GmodContentInstaller")]
 [assembly: AssemblyProduct("GMod Content Wizard")]
 [assembly: AssemblyDescription("Install Garry's Mod content like maps and models")]
 [assembly: AssemblyCopyright("Copyright 2026 Serpensin")]

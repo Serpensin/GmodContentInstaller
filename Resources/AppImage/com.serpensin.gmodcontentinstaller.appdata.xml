@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component type="desktop-application">
-  <id>com.serpensin.gmodcontentwizard</id>
-  <name>GMod Content Wizard</name>
+  <id>com.serpensin.gmodcontentinstaller</id>
+  <name>GmodContentInstaller</name>
   <summary>Install Garry's Mod content like maps and models</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <description>
-    <p>GMod Content Wizard simplifies installing Garry's Mod content like maps, models, and other addons from various sources.</p>
+    <p>GmodContentInstaller simplifies installing Garry's Mod content like maps, models, and other addons from various sources.</p>
     <p>Features: automatic addons folder detection, server selection by ping, drive usage display, smart toggle for selective content installation.</p>
   </description>
-  <launchable type="desktop-id">com.serpensin.gmodcontentwizard.desktop</launchable>
+  <launchable type="desktop-id">com.serpensin.gmodcontentinstaller.desktop</launchable>
   <url type="homepage">https://github.com/Serpensin/GmodContentInstaller</url>
   <developer id="com.serpensin">
     <name>Serpensin</name>
     <url>https://github.com/Serpensin</url>
   </developer>
   <provides>
-    <binary>GModContentWizard</binary>
+    <binary>GmodContentInstaller</binary>
   </provides>
   <releases>
     <release version="[[VERSION]]" date="[[DATE]]">
@@ -27,11 +27,11 @@
   <screenshots>
     <screenshot type="default">
       <caption>Main application window showing light theme</caption>
-      <image width="800" height="450">https://cdn.serpensin.com/gmodcontentwizard/Light.png</image>
+      <image width="800" height="450">https://cdn.serpensin.com/gmodcontentinstaller/Light.png</image>
     </screenshot>
     <screenshot>
       <caption>Main application window showing dark theme</caption>
-      <image width="800" height="450">https://cdn.serpensin.com/gmodcontentwizard/Dark.png</image>
+      <image width="800" height="450">https://cdn.serpensin.com/gmodcontentinstaller/Dark.png</image>
     </screenshot>
   </screenshots>
 </component>

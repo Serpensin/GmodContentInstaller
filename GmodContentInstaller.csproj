@@ -10,6 +10,7 @@
     <PlatformTarget>x64</PlatformTarget>
 
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <AssemblyName>GModContentWizard</AssemblyName>
     <UseAvalonia>true</UseAvalonia>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,6 +23,11 @@
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Resources\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\urls.json">
