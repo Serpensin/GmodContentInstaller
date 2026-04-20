@@ -26,23 +26,23 @@ run:
 publish-linux:
 	@mkdir -p dist
 	dotnet publish -c Release -r linux-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GModContentWizard ./dist/GModContentWizard.run
-	@chmod +x ./dist/GModContentWizard.run
+	@cp ./dist-temp/GmodContentInstaller ./dist/GmodContentInstaller.run
+	@chmod +x ./dist/GmodContentInstaller.run
 	@rm -rf ./dist-temp
 
 publish-linux-sc:
 	@mkdir -p dist
 	dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GModContentWizard ./dist/GModContentWizard-sc.run
-	@chmod +x ./dist/GModContentWizard-sc.run
+	@cp ./dist-temp/GmodContentInstaller ./dist/GmodContentInstaller-sc.run
+	@chmod +x ./dist/GmodContentInstaller-sc.run
 	@rm -rf ./dist-temp
 
 publish-appimage: check-appdir
 	@VERSION=$$(grep AssemblyFileVersion AssemblyInfo.cs | sed 's/.*"\([^"]*\)".*/\1/' | cut -d'.' -f1-3); \
 	echo "Packaging AppImage..."; \
-	appimagetool ./dist/AppImage ./dist/GMod-Content-Wizard-$${VERSION}-x86_64.AppImage 2>&1 | grep -v "value.*for key.*Version" || true; \
+	appimagetool ./dist/AppImage ./dist/GmodContentInstaller-$${VERSION}-x86_64.AppImage 2>&1 | grep -v "value.*for key.*Version" || true; \
 	rm -rf ./dist/AppImage; \
-	echo "Done: dist/GMod-Content-Wizard-$${VERSION}-x86_64.AppImage"
+	echo "Done: dist/GmodContentInstaller-$${VERSION}-x86_64.AppImage"
 
 check-appdir:
 	@echo "Building AppImage for checking..."
@@ -62,13 +62,13 @@ check-appdir:
 cp Resources/Icon.png ./dist/AppImage/com.serpensin.gmodcontentwizard.png; \
 cp Resources/Icon.png ./dist/AppImage/usr/share/icons/hicolor/256x256/apps/com.serpensin.gmodcontentwizard.png; \
 		cp Resources/Icon.png ./dist/AppImage/.DirIcon; \
-	fi
+ fi
 	@mkdir -p ./dist/AppImage/usr/share/applications
-	@cp Resources/AppImage/com.serpensin.gmodcontentwizard.desktop ./dist/AppImage/com.serpensin.gmodcontentwizard.desktop
-	@cp ./dist/AppImage/com.serpensin.gmodcontentwizard.desktop ./dist/AppImage/usr/share/applications/
+	@cp Resources/AppImage/com.serpensin.gmodcontentinstaller.desktop ./dist/AppImage/com.serpensin.gmodcontentinstaller.desktop
+	@cp ./dist/AppImage/com.serpensin.gmodcontentinstaller.desktop ./dist/AppImage/usr/share/applications/
 	@mkdir -p ./dist/AppImage/usr/share/metainfo
 	@VERSION=$$(grep AssemblyFileVersion AssemblyInfo.cs | sed 's/.*"\([^"]*\)".*/\1/' | cut -d'.' -f1-3); \
-	sed -e "s/\[\[VERSION\]\]/$$VERSION/g" -e "s/\[\[DATE\]\]/$$(date +%Y-%m-%d)/g" Resources/AppImage/com.serpensin.gmodcontentwizard.appdata.xml > ./dist/AppImage/usr/share/metainfo/com.serpensin.gmodcontentwizard.appdata.xml
+	sed -e "s/\[\[VERSION\]\]/$$VERSION/g" -e "s/\[\[DATE\]\]/$$(date +%Y-%m-%d)/g" Resources/AppImage/com.serpensin.gmodcontentinstaller.appdata.xml > ./dist/AppImage/usr/share/metainfo/com.serpensin.gmodcontentinstaller.appdata.xml
 	@echo "Fetching appdir-lint.sh..."
 	@curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/appdir-lint.sh -o ./appdir-lint.sh
 	@chmod +x ./appdir-lint.sh
@@ -82,13 +82,13 @@ cp Resources/Icon.png ./dist/AppImage/usr/share/icons/hicolor/256x256/apps/com.s
 publish-windows:
 	@mkdir -p dist
 	dotnet publish -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GModContentWizard.exe ./dist/GModContentWizard.exe
+	@cp ./dist-temp/GmodContentInstaller.exe ./dist/GmodContentInstaller.exe
 	@rm -rf ./dist-temp
 
 publish-windows-sc:
 	@mkdir -p dist
 	dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GModContentWizard.exe ./dist/GModContentWizard-sc.exe
+	@cp ./dist-temp/GmodContentInstaller.exe ./dist/GmodContentInstaller-sc.exe
 	@rm -rf ./dist-temp
 
 publish-all: publish-linux publish-linux-sc publish-windows publish-windows-sc publish-appimage

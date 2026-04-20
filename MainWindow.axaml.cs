@@ -37,10 +37,10 @@ namespace GModContentWizard
             var version = assembly.GetName().Version?.ToString() ?? "1.0.0";
             VersionText.Text = $"Version {version}";
             
-            var titleAttr = (System.Reflection.AssemblyTitleAttribute?)Attribute.GetCustomAttribute(
-                assembly, typeof(System.Reflection.AssemblyTitleAttribute));
-            if (titleAttr != null && !string.IsNullOrEmpty(titleAttr.Title))
-                TitleText.Text = titleAttr.Title;
+            var titleAttr = (System.Reflection.AssemblyProductAttribute?)Attribute.GetCustomAttribute(
+                assembly, typeof(System.Reflection.AssemblyProductAttribute));
+            if (titleAttr != null && !string.IsNullOrEmpty(titleAttr.Product))
+                TitleText.Text = titleAttr.Product;
 
             var descAttr = (System.Reflection.AssemblyDescriptionAttribute?)Attribute.GetCustomAttribute(
                 assembly, typeof(System.Reflection.AssemblyDescriptionAttribute));
