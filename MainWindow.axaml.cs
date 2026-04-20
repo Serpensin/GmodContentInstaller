@@ -243,9 +243,13 @@ namespace GModContentWizard
             PathDetectButton.IsEnabled = false;
             LaunchGModButton.IsEnabled = false;
 
-            try
+try
             {
-                await ProcessTogglesAsync();
+                var icoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icon.ico");
+                if (File.Exists(icoPath))
+                {
+                    Icon = new WindowIcon(icoPath);
+                }
             }
             finally
             {

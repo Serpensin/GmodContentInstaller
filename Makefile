@@ -26,14 +26,14 @@ run:
 publish-linux:
 	@mkdir -p dist
 	dotnet publish -c Release -r linux-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GmodContentInstaller ./dist/GmodContentInstaller.run
+	@cp ./dist-temp/GModContentWizard ./dist/GmodContentInstaller.run
 	@chmod +x ./dist/GmodContentInstaller.run
 	@rm -rf ./dist-temp
 
 publish-linux-sc:
 	@mkdir -p dist
 	dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GmodContentInstaller ./dist/GmodContentInstaller-sc.run
+	@cp ./dist-temp/GModContentWizard ./dist/GmodContentInstaller-sc.run
 	@chmod +x ./dist/GmodContentInstaller-sc.run
 	@rm -rf ./dist-temp
 
@@ -82,13 +82,13 @@ cp Resources/Icon.png ./dist/AppImage/usr/share/icons/hicolor/256x256/apps/com.s
 publish-windows:
 	@mkdir -p dist
 	dotnet publish -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GmodContentInstaller.exe ./dist/GmodContentInstaller.exe
+	@cp ./dist-temp/GModContentWizard.exe ./dist/GmodContentInstaller.exe
 	@rm -rf ./dist-temp
 
 publish-windows-sc:
 	@mkdir -p dist
 	dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o ./dist-temp
-	@cp ./dist-temp/GmodContentInstaller.exe ./dist/GmodContentInstaller-sc.exe
+	@cp ./dist-temp/GModContentWizard.exe ./dist/GmodContentInstaller-sc.exe
 	@rm -rf ./dist-temp
 
 publish-all: publish-linux publish-linux-sc publish-windows publish-windows-sc publish-appimage

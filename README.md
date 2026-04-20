@@ -6,7 +6,7 @@ A desktop application for simplifying the installation of Garry's Mod content (m
 
 | Light Theme | Dark Theme |
 |-------------|------------|
-| ![Light](https://cdn.serpensin.com/gmodcontentwizard/Light.png) | ![Dark](https://cdn.serpensin.com/gmodcontentwizard/Dark.png) |
+| ![Light](https://cdn.serpensin.com/gmodcontentinstaller/Light.png) | ![Dark](https://cdn.serpensin.com/gmodcontentinstaller/Dark.png) |
 
 ## Features
 
