@@ -29,6 +29,9 @@ namespace GModContentWizard
         private DriveUsageUpdater? driveUsageUpdater;
         private bool isOperationRunning = false;
 
+        /// <summary>
+        /// Initializes a new instance of the MainWindow class.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -68,8 +71,35 @@ namespace GModContentWizard
             
             downloader = new Downloader(ProgressBar, DownloadButton, StatusText);
             driveUsageUpdater = new DriveUsageUpdater(DriveSpaceUsageBar);
+
+            _ = CheckForUpdateAsync();
         }
 
+        /// <summary>
+        /// Checks for application updates and displays a notification if a newer version is available.
+        /// </summary>
+        private async Task CheckForUpdateAsync()
+        {
+            try
+            {
+                var (hasUpdate, latestVersion) = await UpdateChecker.CheckForUpdateAsync();
+                if (hasUpdate && !string.IsNullOrEmpty(latestVersion))
+                {
+                    var linkText = $"Version {latestVersion} verfügbar";
+                    UpdateText.Text = linkText;
+                    UpdateText.IsVisible = true;
+                    UpdateText.Tag = UpdateChecker.LatestReleaseUrl;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Update check failed");
+            }
+        }
+
+        /// <summary>
+        /// Loads content information asynchronously for all game sections.
+        /// </summary>
         public async Task LoadInfoAsync()
         {
             if (string.IsNullOrEmpty(addonsPath)) return;
@@ -106,6 +136,9 @@ namespace GModContentWizard
             Log.Information("All content info loaded");
         }
 
+        /// <summary>
+        /// Launches Garry's Mod via Steam protocol.
+        /// </summary>
         private void LaunchGMod_Click(object? sender, RoutedEventArgs e)
         {
             try
@@ -123,6 +156,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Resets the window size to default dimensions (1280x800).
+        /// </summary>
         private void ResetSize_Click(object? sender, RoutedEventArgs e)
         {
             Width = 1280;
@@ -131,6 +167,9 @@ namespace GModContentWizard
             Log.Information("Window size reset to 1280x800");
         }
 
+        /// <summary>
+        /// Opens the Discord link in the default browser.
+        /// </summary>
         private async void Logo_Click(object? sender, RoutedEventArgs e)
         {
             try
@@ -147,6 +186,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Opens the addons folder in the file explorer.
+        /// </summary>
         private void PathShowLabel_Click(object? sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(addonsPath)) return;
@@ -165,16 +207,47 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Minimizes the window to the taskbar.
+        /// </summary>
         private void Minimize_Click(object? sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
         }
 
+        /// <summary>
+        /// Closes the application window.
+        /// </summary>
         private void Close_Click(object? sender, RoutedEventArgs e)
         {
             Close();
         }
 
+        /// <summary>
+        /// Opens the update release page in the browser when the update text is clicked.
+        /// </summary>
+        private void Update_Click(object? sender, RoutedEventArgs e)
+        {
+            if (UpdateText.Tag is string url && !string.IsNullOrEmpty(url))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to open update link");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the path detection button click, detecting or prompting for the GMod addons path.
+        /// </summary>
         private async void PathDetectButton_Click(object? sender, RoutedEventArgs e)
         {
             PathDetectButton.IsEnabled = false;
@@ -224,6 +297,9 @@ namespace GModContentWizard
             PathDetectButton.IsEnabled = true;
         }
 
+        /// <summary>
+        /// Handles the download/apply button click, processing all toggles.
+        /// </summary>
         private async void DownloadButton_Click(object? sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(addonsPath))
@@ -262,6 +338,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Handles toggle switch changes, updating the drive usage display.
+        /// </summary>
         private void ContentToggle_Click(object? sender, RoutedEventArgs e)
         {
             if (addonsPath == null)
@@ -303,10 +382,19 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Array of game section keys used for iteration.
+        /// </summary>
         private static readonly string[] GameKeys = { "CSS", "DOD", "HL1", "HL2 Ep1", "HL2 Ep2", "HL2 Extras", "Portal", "Portal 2", "TF2", "L4D", "L4D2" };
 
+        /// <summary>
+        /// Gets the list of game keys.
+        /// </summary>
         private static string[] GetGameKeys() => GameKeys;
 
+        /// <summary>
+        /// Gets the toggle switches for a given game key.
+        /// </summary>
         private (ToggleSwitch content, ToggleSwitch maps) GetToggles(string gameKey) => gameKey switch
         {
             "CSS" => (CSSButtonContent, CSSButtonMaps),
@@ -323,6 +411,9 @@ namespace GModContentWizard
             _ => throw new ArgumentException($"Unknown game key: {gameKey}")
         };
 
+        /// <summary>
+        /// Gets the text labels for a given game key.
+        /// </summary>
         private (TextBlock content, TextBlock maps) GetLabels(string gameKey) => gameKey switch
         {
             "CSS" => (CSSLabelContent, CSSLabelMaps),
@@ -339,6 +430,11 @@ namespace GModContentWizard
             _ => throw new ArgumentException($"Unknown game key: {gameKey}")
         };
 
+        /// <summary>
+        /// Formats a byte count into a human-readable string.
+        /// </summary>
+        /// <param name="bytes">The size in bytes.</param>
+        /// <returns>A formatted string representation.</returns>
         public static string FormatSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
@@ -352,6 +448,10 @@ namespace GModContentWizard
             return $"{size:0.##} {sizes[order]}";
         }
 
+        /// <summary>
+        /// Loads content information from JSON data.
+        /// </summary>
+        /// <param name="json">The JSON string containing content information.</param>
         private void LoadContentFromJson(string json)
         {
             try
@@ -369,6 +469,12 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Gets ping times for primary and secondary servers.
+        /// </summary>
+        /// <param name="primaryHost">The primary server hostname.</param>
+        /// <param name="secondaryHost">The secondary server hostname.</param>
+        /// <returns>A tuple of ping times in milliseconds.</returns>
         private async Task<(long primary, long secondary)> GetPingTimesAsync(string? primaryHost, string? secondaryHost)
         {
             long primaryPing = long.MaxValue, secondaryPing = long.MaxValue;
@@ -397,11 +503,19 @@ namespace GModContentWizard
             return (primaryPing, secondaryPing);
         }
 
+        /// <summary>
+        /// Gets content info from the dictionary by key.
+        /// </summary>
+        /// <param name="key">The content key.</param>
+        /// <returns>The ContentInfo object or null if not found.</returns>
         private ContentInfo? GetContentInfo(string key)
         {
             return contentInfoDictionary.TryGetValue(key, out var info) ? info : null;
         }
 
+        /// <summary>
+        /// Updates the UI for content and maps sections based on installation status and availability.
+        /// </summary>
         private async Task UpdateContentAndMapsAsync(ContentInfo? content, TextBlock? contentLabel, ToggleSwitch? contentButton, TextBlock? mapLabel, ToggleSwitch? mapButton)
         {
             if (content == null || string.IsNullOrEmpty(addonsPath)) return;
@@ -422,6 +536,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Updates the content label and toggle button based on availability and installation status.
+        /// </summary>
         private void UpdateContentLabelAndButton(TextBlock label, ToggleSwitch button, bool canEnable, bool isInstalled, long downloadSize, long installSize)
         {
             if (canEnable)
@@ -442,6 +559,9 @@ namespace GModContentWizard
             if (isInstalled) { button.IsChecked = true; button.IsEnabled = true; }
         }
 
+        /// <summary>
+        /// Updates the maps label and toggle button based on availability and installation status.
+        /// </summary>
         private void UpdateMapLabelAndButton(TextBlock label, ToggleSwitch button, bool canEnable, bool isInstalled, long downloadSize, long installSize)
         {
             if (canEnable)
@@ -462,6 +582,12 @@ namespace GModContentWizard
             if (isInstalled) { button.IsChecked = true; button.IsEnabled = true; }
         }
 
+        /// <summary>
+        /// Determines if content can be enabled based on server availability.
+        /// </summary>
+        /// <param name="contentInfo">The content information.</param>
+        /// <param name="serverPref">The server preference.</param>
+        /// <returns>True if the content can be enabled.</returns>
         private async Task<bool> CanBeEnabledAsync(ContentInfo contentInfo, ServerPreference serverPref)
         {
             string url = serverPref == ServerPreference.Primary ? contentInfo.PrimaryUrl : contentInfo.SecondaryUrl;
@@ -469,6 +595,9 @@ namespace GModContentWizard
             return reachable;
         }
 
+        /// <summary>
+        /// Gets server information based on the server preference.
+        /// </summary>
         private static (string url, long downloadSize, string format) GetServerInfo(ContentInfo content, ServerPreference pref)
         {
             return pref == ServerPreference.Primary
@@ -476,6 +605,9 @@ namespace GModContentWizard
                 : (content.SecondaryUrl, content.SecondaryDownloadSize, content.SecondaryFormat);
         }
 
+        /// <summary>
+        /// Processes all toggle switches, executing download/delete actions based on their state.
+        /// </summary>
         private async Task ProcessTogglesAsync()
         {
             var actions = new List<(ContentInfo Info, TextBlock Label, ToggleSwitch Button, bool IsContent, bool IsInstall)>();
@@ -517,6 +649,9 @@ namespace GModContentWizard
             await LoadInfoAsync();
         }
 
+        /// <summary>
+        /// Handles downloading and extracting content from the server.
+        /// </summary>
         private async Task HandleDownloadAndExtractAsync(ContentInfo content, TextBlock label, ServerPreference pref, bool isContent)
         {
             if (addonsPath == null) return;
@@ -544,6 +679,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Handles deleting content from the addons directory.
+        /// </summary>
         private async Task HandleDeleteAsync(ContentInfo content, TextBlock label, ToggleSwitch button, ServerPreference pref, bool isContent)
         {
             if (addonsPath == null) return;
@@ -571,6 +709,9 @@ namespace GModContentWizard
             }
         }
 
+        /// <summary>
+        /// Specifies the preferred download server.
+        /// </summary>
         private enum ServerPreference { Primary, Secondary }
     }
 }

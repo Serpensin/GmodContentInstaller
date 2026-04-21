@@ -26,10 +26,14 @@
                     <TextBlock x:Name="DescriptionText" Text="" 
                                FontSize="10"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                    <TextBlock x:Name="VersionText" Text="Version 1.0.0" 
+<TextBlock x:Name="VersionText" Text="Version 1.0.0" 
                                FontSize="11"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                </StackPanel>
+                     <TextBlock x:Name="UpdateText" Text="" IsVisible="False"
+                               FontSize="11" Cursor="Hand"
+                               Foreground="#4CAF50"
+                               PointerPressed="Update_Click"/>
+                 </StackPanel>
             </Grid>
         </Border>
 

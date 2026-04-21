@@ -1,19 +1,38 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GModContentWizard
 {
     /// <summary>
     /// Handles downloading files from URLs with progress reporting and cancellation support.
     /// </summary>
-    internal class Downloader(ProgressBar progressBar, Button downloadButton, TextBlock statusText)
+    internal class Downloader : IDisposable
     {
-        private readonly ProgressBar _progressBar = progressBar;
-        private readonly Button _downloadButton = downloadButton;
-        private readonly TextBlock _statusText = statusText;
+        private readonly ProgressBar _progressBar;
+        private readonly Button _downloadButton;
+        private readonly TextBlock _statusText;
         private CancellationTokenSource? _cancellationTokenSource;
         private int _dotCount = 0;
         private System.Timers.Timer? _dotTimer;
+        private bool _disposed;
+
+        /// <summary>
+        /// Initializes a new instance of the Downloader class.
+        /// </summary>
+        /// <param name="progressBar">The progress bar to update during download.</param>
+        /// <param name="downloadButton">The download button to show/hide during download.</param>
+        /// <param name="statusText">The text block to show status messages.</param>
+        public Downloader(ProgressBar progressBar, Button downloadButton, TextBlock statusText)
+        {
+            _progressBar = progressBar;
+            _downloadButton = downloadButton;
+            _statusText = statusText;
+        }
 
         /// <summary>
         /// Downloads a file from the specified URL to the temp path.
@@ -110,6 +129,19 @@ namespace GModContentWizard
             _dotTimer?.Stop();
             _dotTimer?.Dispose();
             _dotTimer = null;
+        }
+
+        /// <summary>
+        /// Disposes the downloader and cancels any ongoing operations.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
+            StopDotAnimation();
         }
     }
 }
