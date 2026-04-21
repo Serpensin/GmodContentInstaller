@@ -8,8 +8,7 @@
         Width="1280" Height="800"
         MinWidth="1024" MinHeight="700"
         Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-        WindowStartupLocation="CenterScreen"
-        Icon="avares://GModContentWizard/Resources/Icon.ico">
+        WindowStartupLocation="CenterScreen">
 
     <Grid RowDefinitions="Auto,*,Auto">
         <!-- Title Bar -->

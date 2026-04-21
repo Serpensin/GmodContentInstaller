@@ -6,5 +6,5 @@ Exec=GmodContentInstaller
 Type=Application
 Categories=Utility;
 Terminal=false
-Icon=com.serpensin.gmodcontentinstaller
+Icon=GModContentWizard
 Keywords=gmod;garry;mod;maps;content;download;installer;

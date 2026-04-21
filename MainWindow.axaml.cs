@@ -243,13 +243,13 @@ namespace GModContentWizard
             PathDetectButton.IsEnabled = false;
             LaunchGModButton.IsEnabled = false;
 
-try
+            try
             {
-                var icoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Icon.ico");
-                if (File.Exists(icoPath))
-                {
-                    Icon = new WindowIcon(icoPath);
-                }
+                await ProcessTogglesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Download/Apply operation failed");
             }
             finally
             {
@@ -274,47 +274,22 @@ try
             {
                 long totalChange = 0;
 
-                // Alle Switches durchgehen und kumulative Änderung berechnen
-                var allSwitches = new (ToggleSwitch toggle, string key)[]
+                foreach (var gameKey in GetGameKeys())
                 {
-                    (CSSButtonContent, "CSS Content"),
-                    (CSSButtonMaps, "CSS Maps"),
-                    (DODButtonContent, "DOD Content"),
-                    (DODButtonMaps, "DOD Maps"),
-                    (HL1ButtonContent, "HL1 Content"),
-                    (HL1ButtonMaps, "HL1 Maps"),
-                    (HL2Ep1ButtonContent, "HL2 Ep1 Content"),
-                    (HL2Ep1ButtonMaps, "HL2 Ep1 Maps"),
-                    (HL2Ep2ButtonContent, "HL2 Ep2 Content"),
-                    (HL2Ep2ButtonMaps, "HL2 Ep2 Maps"),
-                    (HL2ExtrasButtonContent, "HL2 Extras Content"),
-                    (HL2ExtrasButtonMaps, "HL2 Extras Maps"),
-                    (PortalButtonContent, "Portal Content"),
-                    (PortalButtonMaps, "Portal Maps"),
-                    (Portal2ButtonContent, "Portal 2 Content"),
-                    (Portal2ButtonMaps, "Portal 2 Maps"),
-                    (TF2ButtonContent, "TF2 Content"),
-                    (TF2ButtonMaps, "TF2 Maps"),
-                    (L4DButtonContent, "L4D Content"),
-                    (L4DButtonMaps, "L4D Maps"),
-                    (L4D2ButtonContent, "L4D2 Content"),
-                };
+                    var (contentSwitch, mapsSwitch) = GetToggles(gameKey);
+                    var contentKey = $"{gameKey} Content";
+                    var mapsKey = $"{gameKey} Maps";
 
-                foreach (var (toggle, key) in allSwitches)
-                {
-                    if (!contentInfoDictionary.TryGetValue(key, out ContentInfo? content))
-                        continue;
-
-                    bool isInstalled = Directory.Exists(Path.Combine(addonsPath, content.InternalName));
-                    bool isChecked = toggle.IsChecked == true;
-
-                    if (isChecked && !isInstalled)
+                    if (contentInfoDictionary.TryGetValue(contentKey, out var content) && contentSwitch.IsChecked == true)
                     {
-                        totalChange += content.InstallSize;
+                        bool isInstalled = Directory.Exists(Path.Combine(addonsPath, content.InternalName));
+                        if (!isInstalled) totalChange += content.InstallSize;
                     }
-                    else if (!isChecked && isInstalled)
+
+                    if (contentInfoDictionary.TryGetValue(mapsKey, out var maps) && mapsSwitch.IsChecked == true)
                     {
-                        totalChange -= content.InstallSize;
+                        bool isInstalled = Directory.Exists(Path.Combine(addonsPath, maps.InternalName));
+                        if (!isInstalled) totalChange += maps.InstallSize;
                     }
                 }
 
@@ -327,6 +302,42 @@ try
                 Log.Error(ex, "Drive update failed");
             }
         }
+
+        private static readonly string[] GameKeys = { "CSS", "DOD", "HL1", "HL2 Ep1", "HL2 Ep2", "HL2 Extras", "Portal", "Portal 2", "TF2", "L4D", "L4D2" };
+
+        private static string[] GetGameKeys() => GameKeys;
+
+        private (ToggleSwitch content, ToggleSwitch maps) GetToggles(string gameKey) => gameKey switch
+        {
+            "CSS" => (CSSButtonContent, CSSButtonMaps),
+            "DOD" => (DODButtonContent, DODButtonMaps),
+            "HL1" => (HL1ButtonContent, HL1ButtonMaps),
+            "HL2 Ep1" => (HL2Ep1ButtonContent, HL2Ep1ButtonMaps),
+            "HL2 Ep2" => (HL2Ep2ButtonContent, HL2Ep2ButtonMaps),
+            "HL2 Extras" => (HL2ExtrasButtonContent, HL2ExtrasButtonMaps),
+            "Portal" => (PortalButtonContent, PortalButtonMaps),
+            "Portal 2" => (Portal2ButtonContent, Portal2ButtonMaps),
+            "TF2" => (TF2ButtonContent, TF2ButtonMaps),
+            "L4D" => (L4DButtonContent, L4DButtonMaps),
+            "L4D2" => (L4D2ButtonContent, L4D2ButtonMaps),
+            _ => throw new ArgumentException($"Unknown game key: {gameKey}")
+        };
+
+        private (TextBlock content, TextBlock maps) GetLabels(string gameKey) => gameKey switch
+        {
+            "CSS" => (CSSLabelContent, CSSLabelMaps),
+            "DOD" => (DODLabelContent, DODLabelMaps),
+            "HL1" => (HL1LabelContent, HL1LabelMaps),
+            "HL2 Ep1" => (HL2Ep1LabelContent, HL2Ep1LabelMaps),
+            "HL2 Ep2" => (HL2Ep2LabelContent, HL2Ep2LabelMaps),
+            "HL2 Extras" => (HL2ExtrasLabelContent, HL2ExtrasLabelMaps),
+            "Portal" => (PortalLabelContent, PortalLabelMaps),
+            "Portal 2" => (Portal2LabelContent, Portal2LabelMaps),
+            "TF2" => (TF2LabelContent, TF2LabelMaps),
+            "L4D" => (L4DLabelContent, L4DLabelMaps),
+            "L4D2" => (L4D2LabelContent, L4D2LabelMaps),
+            _ => throw new ArgumentException($"Unknown game key: {gameKey}")
+        };
 
         public static string FormatSize(long bytes)
         {
@@ -467,47 +478,39 @@ try
 
         private async Task ProcessTogglesAsync()
         {
-            var toggleHandlers = new (ToggleSwitch toggle, ContentInfo? content, TextBlock? label, bool isContent)[]
+            var actions = new List<(ContentInfo Info, TextBlock Label, ToggleSwitch Button, bool IsContent, bool IsInstall)>();
+
+            foreach (var gameKey in GetGameKeys())
             {
-                (CSSButtonContent, GetContentInfo("CSS Content"), CSSLabelContent, true),
-                (CSSButtonMaps, GetContentInfo("CSS Maps"), CSSLabelMaps, false),
-                (DODButtonContent, GetContentInfo("DOD Content"), DODLabelContent, true),
-                (DODButtonMaps, GetContentInfo("DOD Maps"), DODLabelMaps, false),
-                (HL1ButtonContent, GetContentInfo("HL1 Content"), HL1LabelContent, true),
-                (HL1ButtonMaps, GetContentInfo("HL1 Maps"), HL1LabelMaps, false),
-                (HL2Ep1ButtonContent, GetContentInfo("HL2 Ep1 Content"), HL2Ep1LabelContent, true),
-                (HL2Ep1ButtonMaps, GetContentInfo("HL2 Ep1 Maps"), HL2Ep1LabelMaps, false),
-                (HL2Ep2ButtonContent, GetContentInfo("HL2 Ep2 Content"), HL2Ep2LabelContent, true),
-                (HL2Ep2ButtonMaps, GetContentInfo("HL2 Ep2 Maps"), HL2Ep2LabelMaps, false),
-                (HL2ExtrasButtonContent, GetContentInfo("HL2 Extras Content"), HL2ExtrasLabelContent, true),
-                (HL2ExtrasButtonMaps, GetContentInfo("HL2 Extras Maps"), HL2ExtrasLabelMaps, false),
-                (PortalButtonContent, GetContentInfo("Portal Content"), PortalLabelContent, true),
-                (PortalButtonMaps, GetContentInfo("Portal Maps"), PortalLabelMaps, false),
-                (Portal2ButtonContent, GetContentInfo("Portal 2 Content"), Portal2LabelContent, true),
-                (Portal2ButtonMaps, GetContentInfo("Portal 2 Maps"), Portal2LabelMaps, false),
-                (TF2ButtonContent, GetContentInfo("TF2 Content"), TF2LabelContent, true),
-                (TF2ButtonMaps, GetContentInfo("TF2 Maps"), TF2LabelMaps, false),
-                (L4DButtonContent, GetContentInfo("L4D Content"), L4DLabelContent, true),
-                (L4DButtonMaps, GetContentInfo("L4D Maps"), L4DLabelMaps, false),
-                (L4D2ButtonContent, GetContentInfo("L4D2 Content"), L4D2LabelContent, true),
-            };
+                var (contentSwitch, mapsSwitch) = GetToggles(gameKey);
+                var (contentLabel, mapsLabel) = GetLabels(gameKey);
+                var contentKey = $"{gameKey} Content";
+                var mapsKey = $"{gameKey} Maps";
 
-            foreach (var (toggle, content, label, isContent) in toggleHandlers)
-            {
-                if (content == null || toggle.IsChecked == null || label == null) continue;
-
-                bool shouldBeEnabled = toggle.IsChecked == true;
-                bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, content.InternalName));
-
-                if (shouldBeEnabled && !isInstalled)
+                if (contentInfoDictionary.TryGetValue(contentKey, out var content) && contentSwitch.IsChecked == true)
                 {
-                    await HandleDownloadAndExtractAsync(content, label, preferredServer, isContent);
-                    driveUsageUpdater?.UpdateDriveSizeBar(content.InstallSize);
+                    bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, content.InternalName));
+                    actions.Add((content, contentLabel, contentSwitch, true, !isInstalled));
                 }
-                else if (!shouldBeEnabled && isInstalled)
+
+                if (contentInfoDictionary.TryGetValue(mapsKey, out var maps) && mapsSwitch.IsChecked == true)
                 {
-                    await HandleDeleteAsync(content, label, toggle, preferredServer, isContent);
-                    driveUsageUpdater?.UpdateDriveSizeBar(-content.InstallSize);
+                    bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, maps.InternalName));
+                    actions.Add((maps, mapsLabel, mapsSwitch, false, !isInstalled));
+                }
+            }
+
+            foreach (var (info, label, button, isContent, isInstall) in actions)
+            {
+                if (isInstall)
+                {
+                    await HandleDownloadAndExtractAsync(info, label, preferredServer, isContent);
+                    driveUsageUpdater?.UpdateDriveSizeBar(info.InstallSize);
+                }
+                else
+                {
+                    await HandleDeleteAsync(info, label, button, preferredServer, isContent);
+                    driveUsageUpdater?.UpdateDriveSizeBar(-info.InstallSize);
                 }
             }
 

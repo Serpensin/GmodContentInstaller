@@ -57,15 +57,11 @@ check-appdir:
 	mv ./dist/AppImage/usr/bin/GModContentWizard ./dist/AppImage/usr/bin/GModContentWizard.bin
 	@cp Resources/AppImage/AppRun ./dist/AppImage/AppRun
 	@chmod +x ./dist/AppImage/AppRun
-	@mkdir -p ./dist/AppImage/usr/share/icons/hicolor/256x256/apps
-	@if [ -f Resources/Icon.png ]; then \
-cp Resources/Icon.png ./dist/AppImage/com.serpensin.gmodcontentwizard.png; \
-cp Resources/Icon.png ./dist/AppImage/usr/share/icons/hicolor/256x256/apps/com.serpensin.gmodcontentwizard.png; \
-		cp Resources/Icon.png ./dist/AppImage/.DirIcon; \
- fi
 	@mkdir -p ./dist/AppImage/usr/share/applications
 	@cp Resources/AppImage/com.serpensin.gmodcontentinstaller.desktop ./dist/AppImage/com.serpensin.gmodcontentinstaller.desktop
 	@cp ./dist/AppImage/com.serpensin.gmodcontentinstaller.desktop ./dist/AppImage/usr/share/applications/
+	@cp Resources/Icon.png ./dist/AppImage/.DirIcon
+	@cp Resources/Icon.png ./dist/AppImage/GModContentWizard.png
 	@mkdir -p ./dist/AppImage/usr/share/metainfo
 	@VERSION=$$(grep AssemblyFileVersion AssemblyInfo.cs | sed 's/.*"\([^"]*\)".*/\1/' | cut -d'.' -f1-3); \
 	sed -e "s/\[\[VERSION\]\]/$$VERSION/g" -e "s/\[\[DATE\]\]/$$(date +%Y-%m-%d)/g" Resources/AppImage/com.serpensin.gmodcontentinstaller.appdata.xml > ./dist/AppImage/usr/share/metainfo/com.serpensin.gmodcontentinstaller.appdata.xml
