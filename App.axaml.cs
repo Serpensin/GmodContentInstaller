@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using System;
 
 namespace GModContentWizard
 {
@@ -11,6 +13,7 @@ namespace GModContentWizard
     public partial class App : Application
     {
         private Window? _mainWindow;
+        private bool _isShuttingDown;
 
         /// <summary>
         /// Initializes the application by loading XAML resources.
@@ -30,16 +33,23 @@ namespace GModContentWizard
                 _mainWindow = new MainWindow();
                 desktop.MainWindow = _mainWindow;
                 desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
-                desktop.Exit += OnExit;
+                desktop.Exit += OnDesktopExit;
             }
 
             base.OnFrameworkInitializationCompleted();
         }
 
-        private void OnExit(object? sender, EventArgs e)
+        private void OnDesktopExit(object? sender, EventArgs e)
         {
-            _mainWindow?.Close();
-            _mainWindow = null;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_mainWindow != null && !_isShuttingDown)
+                {
+                    _isShuttingDown = true;
+                    _mainWindow.Close();
+                    _mainWindow = null;
+                }
+            });
         }
     }
 }
