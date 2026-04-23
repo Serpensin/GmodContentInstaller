@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Rendering.SceneGraph;
 using Serilog;
 using System;
 using System.IO;
@@ -56,6 +57,14 @@ namespace GModContentWizard
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                .With(new Win32PlatformOptions
+                {
+                    RenderingMode = new[] { Win32RenderingMode.Software }
+                })
+                .With(new X11PlatformOptions
+                {
+                    RenderingMode = new[] { X11RenderingMode.Software }
+                })
                 .LogToTrace();
     }
 }

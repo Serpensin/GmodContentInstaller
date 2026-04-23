@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
@@ -9,6 +10,8 @@ namespace GModContentWizard
     /// </summary>
     public partial class App : Application
     {
+        private Window? _mainWindow;
+
         /// <summary>
         /// Initializes the application by loading XAML resources.
         /// </summary>
@@ -24,10 +27,19 @@ namespace GModContentWizard
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow();
+                _mainWindow = new MainWindow();
+                desktop.MainWindow = _mainWindow;
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+                desktop.Exit += OnExit;
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void OnExit(object? sender, EventArgs e)
+        {
+            _mainWindow?.Close();
+            _mainWindow = null;
         }
     }
 }
