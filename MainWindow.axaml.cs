@@ -3,7 +3,18 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Styling;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Text.Json;
+using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -560,7 +571,7 @@ namespace GModContentWizard
         private void UpdateContentLabelAndButton(TextBlock label, ToggleSwitch button, bool canEnable, bool isInstalled, long downloadSize, long installSize)
         {
             button.IsEnabled = canEnable || isInstalled;
-            var defaultColor = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Themes.ThemeVariant.Light
+            var defaultColor = Application.Current?.ActualThemeVariant == ThemeVariant.Light
                 ? Avalonia.Media.Brushes.Black
                 : Avalonia.Media.Brushes.White;
             
@@ -592,7 +603,7 @@ namespace GModContentWizard
         private void UpdateMapLabelAndButton(TextBlock label, ToggleSwitch button, bool canEnable, bool isInstalled, long downloadSize, long installSize)
         {
             button.IsEnabled = canEnable || isInstalled;
-            var defaultColor = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Themes.ThemeVariant.Light
+            var defaultColor = Application.Current?.ActualThemeVariant == ThemeVariant.Light
                 ? Avalonia.Media.Brushes.Black
                 : Avalonia.Media.Brushes.White;
             
