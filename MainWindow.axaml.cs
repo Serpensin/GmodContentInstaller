@@ -318,6 +318,7 @@ namespace GModContentWizard
             DownloadButton.IsEnabled = false;
             PathDetectButton.IsEnabled = false;
             LaunchGModButton.IsEnabled = false;
+            SetAllTogglesEnabled(false);
 
             try
             {
@@ -333,8 +334,22 @@ namespace GModContentWizard
                 DownloadButton.IsEnabled = true;
                 PathDetectButton.IsEnabled = true;
                 LaunchGModButton.IsEnabled = true;
+                SetAllTogglesEnabled(true);
                 driveUsageUpdater?.SetDriveLetter(addonsPath);
                 driveUsageUpdater?.UpdateDriveSizeBar();
+            }
+        }
+
+        /// <summary>
+        /// Enables or disables all content toggle switches.
+        /// </summary>
+        private void SetAllTogglesEnabled(bool enabled)
+        {
+            foreach (var gameKey in GetGameKeys())
+            {
+                var (contentSwitch, mapsSwitch) = GetToggles(gameKey);
+                contentSwitch.IsEnabled = enabled;
+                mapsSwitch.IsEnabled = enabled;
             }
         }
 
@@ -343,9 +358,12 @@ namespace GModContentWizard
         /// </summary>
         private void ContentToggle_Click(object? sender, RoutedEventArgs e)
         {
-            if (addonsPath == null)
+            if (isOperationRunning || addonsPath == null)
             {
-                Log.Warning("No addons path set");
+                if (sender is ToggleSwitch toggle && !isOperationRunning)
+                {
+                    toggle.IsChecked = !toggle.IsChecked;
+                }
                 return;
             }
 
@@ -541,22 +559,31 @@ namespace GModContentWizard
         /// </summary>
         private void UpdateContentLabelAndButton(TextBlock label, ToggleSwitch button, bool canEnable, bool isInstalled, long downloadSize, long installSize)
         {
-            if (canEnable)
-            {
-                label.Text = $"Content ({FormatSize(downloadSize)} / {FormatSize(installSize)})";
-            }
-            else
-            {
-                label.Foreground = Avalonia.Media.Brushes.Red;
-            }
+            button.IsEnabled = canEnable || isInstalled;
+            var defaultColor = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Themes.ThemeVariant.Light
+                ? Avalonia.Media.Brushes.Black
+                : Avalonia.Media.Brushes.White;
+            
             if (isInstalled)
             {
                 label.Foreground = Avalonia.Media.Brushes.LimeGreen;
                 label.Text = $"Content ({FormatSize(installSize)})";
+                button.IsChecked = true;
+                button.IsEnabled = true;
             }
-            button.IsEnabled = canEnable;
-            if (!canEnable) button.IsChecked = false;
-            if (isInstalled) { button.IsChecked = true; button.IsEnabled = true; }
+            else if (canEnable)
+            {
+                label.Foreground = defaultColor;
+                label.Text = $"Content ({FormatSize(downloadSize)} / {FormatSize(installSize)})";
+                button.IsChecked = false;
+            }
+            else
+            {
+                label.Foreground = Avalonia.Media.Brushes.Red;
+                label.Text = $"Content (Nicht verfügbar)";
+                button.IsChecked = false;
+                button.IsEnabled = false;
+            }
         }
 
         /// <summary>
@@ -564,22 +591,31 @@ namespace GModContentWizard
         /// </summary>
         private void UpdateMapLabelAndButton(TextBlock label, ToggleSwitch button, bool canEnable, bool isInstalled, long downloadSize, long installSize)
         {
-            if (canEnable)
-            {
-                label.Text = $"Maps ({FormatSize(downloadSize)} / {FormatSize(installSize)})";
-            }
-            else
-            {
-                label.Foreground = Avalonia.Media.Brushes.Red;
-            }
+            button.IsEnabled = canEnable || isInstalled;
+            var defaultColor = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Themes.ThemeVariant.Light
+                ? Avalonia.Media.Brushes.Black
+                : Avalonia.Media.Brushes.White;
+            
             if (isInstalled)
             {
                 label.Foreground = Avalonia.Media.Brushes.LimeGreen;
                 label.Text = $"Maps ({FormatSize(installSize)})";
+                button.IsChecked = true;
+                button.IsEnabled = true;
             }
-            button.IsEnabled = canEnable;
-            if (!canEnable) button.IsChecked = false;
-            if (isInstalled) { button.IsChecked = true; button.IsEnabled = true; }
+            else if (canEnable)
+            {
+                label.Foreground = defaultColor;
+                label.Text = $"Maps ({FormatSize(downloadSize)} / {FormatSize(installSize)})";
+                button.IsChecked = false;
+            }
+            else
+            {
+                label.Foreground = Avalonia.Media.Brushes.Red;
+                label.Text = $"Maps (Nicht verfügbar)";
+                button.IsChecked = false;
+                button.IsEnabled = false;
+            }
         }
 
         /// <summary>
@@ -610,7 +646,8 @@ namespace GModContentWizard
         /// </summary>
         private async Task ProcessTogglesAsync()
         {
-            var actions = new List<(ContentInfo Info, TextBlock Label, ToggleSwitch Button, bool IsContent, bool IsInstall)>();
+            var installActions = new List<(ContentInfo Info, TextBlock Label, bool IsContent)>();
+            var deleteActions = new List<(ContentInfo Info, TextBlock Label, bool IsContent)>();
 
             foreach (var gameKey in GetGameKeys())
             {
@@ -619,34 +656,83 @@ namespace GModContentWizard
                 var contentKey = $"{gameKey} Content";
                 var mapsKey = $"{gameKey} Maps";
 
-                if (contentInfoDictionary.TryGetValue(contentKey, out var content) && contentSwitch.IsChecked == true)
+                if (contentInfoDictionary.TryGetValue(contentKey, out var content))
                 {
                     bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, content.InternalName));
-                    actions.Add((content, contentLabel, contentSwitch, true, !isInstalled));
+                    if (contentSwitch.IsChecked == true && !isInstalled)
+                    {
+                        installActions.Add((content, contentLabel, true));
+                    }
+                    else if (contentSwitch.IsChecked == false && isInstalled)
+                    {
+                        deleteActions.Add((content, contentLabel, true));
+                    }
                 }
 
-                if (contentInfoDictionary.TryGetValue(mapsKey, out var maps) && mapsSwitch.IsChecked == true)
+                if (contentInfoDictionary.TryGetValue(mapsKey, out var maps))
                 {
                     bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, maps.InternalName));
-                    actions.Add((maps, mapsLabel, mapsSwitch, false, !isInstalled));
+                    if (mapsSwitch.IsChecked == true && !isInstalled)
+                    {
+                        installActions.Add((maps, mapsLabel, false));
+                    }
+                    else if (mapsSwitch.IsChecked == false && isInstalled)
+                    {
+                        deleteActions.Add((maps, mapsLabel, false));
+                    }
                 }
             }
 
-            foreach (var (info, label, button, isContent, isInstall) in actions)
+            foreach (var (info, label, isContent) in deleteActions)
             {
-                if (isInstall)
-                {
-                    await HandleDownloadAndExtractAsync(info, label, preferredServer, isContent);
-                    driveUsageUpdater?.UpdateDriveSizeBar(info.InstallSize);
-                }
-                else
-                {
-                    await HandleDeleteAsync(info, label, button, preferredServer, isContent);
-                    driveUsageUpdater?.UpdateDriveSizeBar(-info.InstallSize);
-                }
+                if (!isOperationRunning) break;
+                await HandleDeleteAsync(info, label, preferredServer, isContent);
+                driveUsageUpdater?.UpdateDriveSizeBar(-info.InstallSize);
             }
 
-            await LoadInfoAsync();
+            foreach (var (info, label, isContent) in installActions)
+            {
+                if (!isOperationRunning) break;
+                await HandleDownloadAndExtractAsync(info, label, preferredServer, isContent);
+                driveUsageUpdater?.UpdateDriveSizeBar(info.InstallSize);
+            }
+
+            if (isOperationRunning)
+            {
+                await RefreshToggleStatesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Refreshes all toggle states based on actual installation status.
+        /// </summary>
+        private async Task RefreshToggleStatesAsync()
+        {
+            foreach (var gameKey in GetGameKeys())
+            {
+                var (contentSwitch, mapsSwitch) = GetToggles(gameKey);
+                var (contentLabel, mapsLabel) = GetLabels(gameKey);
+                var contentKey = $"{gameKey} Content";
+                var mapsKey = $"{gameKey} Maps";
+
+                if (contentInfoDictionary.TryGetValue(contentKey, out var content))
+                {
+                    bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, content.InternalName));
+                    contentSwitch.IsChecked = isInstalled;
+                    bool canEnable = await CanBeEnabledAsync(content, preferredServer);
+                    contentSwitch.IsEnabled = isInstalled || canEnable;
+                    UpdateContentLabelAndButton(contentLabel, contentSwitch, canEnable, isInstalled, content.PrimaryDownloadSize, content.InstallSize);
+                }
+
+                if (contentInfoDictionary.TryGetValue(mapsKey, out var maps))
+                {
+                    bool isInstalled = Directory.Exists(Path.Combine(addonsPath!, maps.InternalName));
+                    mapsSwitch.IsChecked = isInstalled;
+                    bool canEnable = await CanBeEnabledAsync(maps, preferredServer);
+                    mapsSwitch.IsEnabled = isInstalled || canEnable;
+                    UpdateMapLabelAndButton(mapsLabel, mapsSwitch, canEnable, isInstalled, maps.PrimaryDownloadSize, maps.InstallSize);
+                }
+            }
         }
 
         /// <summary>
@@ -682,9 +768,9 @@ namespace GModContentWizard
         /// <summary>
         /// Handles deleting content from the addons directory.
         /// </summary>
-        private async Task HandleDeleteAsync(ContentInfo content, TextBlock label, ToggleSwitch button, ServerPreference pref, bool isContent)
+        private async Task HandleDeleteAsync(ContentInfo content, TextBlock label, ServerPreference pref, bool isContent)
         {
-            if (addonsPath == null) return;
+            if (addonsPath == null || !isOperationRunning) return;
 
             Log.Information("Deleting {Name}", content.InternalName);
             string contentPath = Path.Combine(addonsPath, content.InternalName);
@@ -695,12 +781,6 @@ namespace GModContentWizard
                 {
                     await Task.Run(() => Directory.Delete(contentPath, recursive: true));
                     Log.Information("Delete successful for {Name}", content.InternalName);
-
-                    bool canEnable = await CanBeEnabledAsync(content, pref);
-                    button.IsChecked = false;
-                    button.IsEnabled = canEnable;
-                    label.Foreground = Avalonia.Media.Brushes.White;
-                    label.Text = isContent ? $"Content ({FormatSize(content.PrimaryDownloadSize)} / {FormatSize(content.InstallSize)})" : $"Maps ({FormatSize(content.PrimaryDownloadSize)} / {FormatSize(content.InstallSize)})";
                 }
                 catch (Exception ex)
                 {
