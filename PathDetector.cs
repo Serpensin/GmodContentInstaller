@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.IO;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -52,18 +53,27 @@ namespace GModContentWizard
         {
             Log.Information("Searching for Garry's Mod on Windows");
 
-            foreach (var drive in DriveInfo.GetDrives())
-            {
-                if (drive.DriveType != DriveType.Fixed && drive.DriveType != DriveType.Removable)
-                    continue;
+            return SearchWindowsKnownPaths();
+        }
 
-                foreach (var path in SearchPaths)
+        private static string? SearchWindowsKnownPaths()
+        {
+            Log.Information("Searching known paths for GMod");
+
+            var drives = DriveInfo.GetDrives()
+                .Where(d => d.DriveType == DriveType.Fixed || d.DriveType == DriveType.Removable)
+                .Select(d => d.Name.TrimEnd('\\'))
+                .ToList();
+
+            foreach (var driveLetter in drives)
+            {
+                foreach (var subPath in SearchPaths)
                 {
-                    var testPath = Path.Combine(drive.Name, path);
+                    var testPath = Path.Combine(driveLetter, subPath);
                     Log.Debug("Checking: {Path}", testPath);
                     if (Directory.Exists(testPath))
                     {
-                        Log.Information("Found addons at: {Path}", testPath);
+                        Log.Information("Found GMod addons at known path: {Path}", testPath);
                         return testPath;
                     }
                 }
