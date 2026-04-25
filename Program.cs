@@ -1,4 +1,8 @@
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media;
+using Avalonia.Platform;
+using Avalonia.Rendering;
 using Serilog;
 using System;
 using System.IO;
@@ -37,7 +41,24 @@ namespace GModContentWizard
             try
             {
                 Log.Information("Application starting");
-                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+                var builder = BuildAvaloniaApp();
+                
+                bool useSoftwareRender = args.Contains("--software-render");
+                if (!useSoftwareRender && IsNvidiaSystem())
+                {
+                    Log.Warning("NVIDIA detected, using software rendering to avoid shutdown crash");
+                    useSoftwareRender = true;
+                }
+                
+                if (useSoftwareRender)
+                {
+                    builder.With(new X11PlatformOptions
+                    {
+                        RenderingMode = new[] { X11RenderingMode.Software }
+                    });
+                }
+                
+                builder.StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)
             {
@@ -47,6 +68,32 @@ namespace GModContentWizard
             {
                 Log.CloseAndFlush();
             }
+        }
+
+        /// <summary>
+        /// Checks if running on an NVIDIA system (heuristic).
+        /// </summary>
+        private static bool IsNvidiaSystem()
+        {
+            try
+            {
+                var nvidiaFiles = new[] { 
+                    "/lib/libnvidia-gl.so.1", 
+                    "/usr/lib/libnvidia-gl.so.1",
+                    "/lib64/libnvidia-gl.so.1"
+                };
+                foreach (var path in nvidiaFiles)
+                {
+                    if (File.Exists(path))
+                        return true;
+                }
+                
+                var procModules = File.ReadAllText("/proc/modules");
+                if (procModules.Contains("nvidia"))
+                    return true;
+            }
+            catch { }
+            return false;
         }
 
         /// <summary>
