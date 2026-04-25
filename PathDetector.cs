@@ -19,6 +19,13 @@ namespace GModContentWizard
             @"Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons"
         ];
 
+        private static readonly string[] LinuxSearchRoots =
+        [
+            ".steam/steam/steamapps/common/GarrysMod",
+            ".local/share/Steam/steamapps/common/GarrysMod",
+            "Steam/steamapps/common/GarrysMod"
+        ];
+
         /// <summary>
         /// Attempts to automatically detect the Garry's Mod addons directory.
         /// </summary>
@@ -90,23 +97,39 @@ namespace GModContentWizard
         /// <returns>The addons path if found, otherwise null.</returns>
         private static string? SearchLinux()
         {
+            string? home = null;
             try
             {
-                var home = Environment.GetEnvironmentVariable("HOME");
+                home = Environment.GetEnvironmentVariable("HOME");
                 if (string.IsNullOrEmpty(home))
                 {
                     Log.Warning("HOME environment variable not set");
                     return null;
                 }
 
-                Log.Information("Searching in HOME: {Home}", home);
+                var locatePath = SearchLinuxWithLocate(home);
+                if (locatePath != null)
+                    return locatePath;
 
+                return SearchLinuxKnownPaths(home);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error searching for GMod on Linux");
+                return home != null ? SearchLinuxKnownPaths(home) : null;
+            }
+        }
+
+        private static string? SearchLinuxWithLocate(string home)
+        {
+            try
+            {
                 var process = new System.Diagnostics.Process
                 {
                     StartInfo = new System.Diagnostics.ProcessStartInfo
                     {
-                        FileName = "find",
-                        Arguments = $"{home} /var/run /mnt -type f -name \"hl2_linux\"",
+                        FileName = "locate",
+                        Arguments = "-l 10 hl2_linux",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -119,37 +142,95 @@ namespace GModContentWizard
                 var error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
 
-                Log.Debug("find output: {Output}", output);
-                if (!string.IsNullOrEmpty(error))
-                    Log.Debug("find error: {Error}", error);
+                if (process.ExitCode == 0)
+                {
+                    Log.Debug("locate output: {Output}", output);
+                    var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var line in lines)
+                    {
+                        var trimmedPath = line.Trim();
+                        if (string.IsNullOrEmpty(trimmedPath)) continue;
+
+                        if (trimmedPath.Contains("GarrysMod") && IsGarrysModHL2(trimmedPath))
+                        {
+                            var gmodRoot = System.IO.Path.GetDirectoryName(trimmedPath);
+                            if (gmodRoot != null)
+                            {
+                                var addonsPath = System.IO.Path.Combine(gmodRoot, "garrysmod", "addons");
+                                Log.Information("Found GMod addons via locate: {Path}", addonsPath);
+                                return addonsPath;
+                            }
+                        }
+                    }
+                }
+                else if (!string.IsNullOrEmpty(error))
+                {
+                    Log.Debug("locate error: {Error}", error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "locate not available or failed");
+            }
+
+            return null;
+        }
+
+        private static string? SearchLinuxKnownPaths(string home)
+        {
+            Log.Information("Searching known paths for GMod");
+
+            foreach (var root in LinuxSearchRoots)
+            {
+                var testPath = System.IO.Path.Combine(home, root);
+                var addonsPath = System.IO.Path.Combine(testPath, "garrysmod", "addons");
+                Log.Debug("Checking: {Path}", addonsPath);
+
+                if (System.IO.Directory.Exists(addonsPath) && IsValidGModPath(testPath))
+                {
+                    Log.Information("Found GMod addons at known path: {Path}", addonsPath);
+                    return addonsPath;
+                }
+            }
+
+            try
+            {
+                var process = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "find",
+                        Arguments = $"{home} -maxdepth 5 -type d -name \"GarrysMod\" 2>/dev/null",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
 
                 var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                
                 foreach (var line in lines)
                 {
                     var trimmedPath = line.Trim();
                     if (string.IsNullOrEmpty(trimmedPath)) continue;
 
-                    Log.Debug("Found hl2_linux at: {Path}", trimmedPath);
-
-                    if (IsGarrysModHL2(trimmedPath))
+                    var addonsPath = System.IO.Path.Combine(trimmedPath, "garrysmod", "addons");
+                    if (System.IO.Directory.Exists(addonsPath))
                     {
-                        var gmodRoot = System.IO.Path.GetDirectoryName(trimmedPath);
-                        if (gmodRoot != null)
-                        {
-                            var addonsPath = System.IO.Path.Combine(gmodRoot, "garrysmod", "addons");
-                            Log.Information("Found GMod addons at: {Path}", addonsPath);
-                            return addonsPath;
-                        }
+                        Log.Information("Found GMod addons via targeted find: {Path}", addonsPath);
+                        return addonsPath;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error searching for GMod on Linux");
+                Log.Debug(ex, "Fallback find failed");
             }
 
-            Log.Warning("No addons directory found on Linux");
             return null;
         }
 
