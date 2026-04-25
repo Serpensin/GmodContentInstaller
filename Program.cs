@@ -1,8 +1,5 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Media;
-using Avalonia.Platform;
-using Avalonia.Rendering;
 using Serilog;
 using System;
 using System.IO;
