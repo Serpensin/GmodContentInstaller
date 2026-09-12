@@ -1,6 +1,6 @@
 {
     "CSS Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/GJkkmxkZN6G6T5Z/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/4t26ifGNfBPYoJR/download",
         "PrimaryDownloadSize": 102780388,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/loccssmaps-RGr6ush38TmTy0a/CSS_Maps_Addon_2021.zip",
@@ -10,7 +10,7 @@
         "InstallSize": 246341632
     },
     "CSS Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/tpg6ifimqf6K5ke/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/WKJAxXeBDdBrZ4q/download",
         "PrimaryDownloadSize": 712040496,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/loccsscontent-OT6d6vwFxj09gRB/CSS_Content_Addon_2021.zip",
@@ -20,7 +20,7 @@
         "InstallSize": 1411682304
     },
     "DOD Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/rFGWqs59iMSsN4X/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/XDxEn2L4xqq2G8K/download",
         "PrimaryDownloadSize": 376177092,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locdodcontent-N506F8pytfxORd8/DOD_Content_Addon_2017.zip",
@@ -30,7 +30,7 @@
         "InstallSize": 850132992
     },
     "DOD Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/jSxiNrGS64q2B7M/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/FRpwCzaQJNxFKBF/download",
         "PrimaryDownloadSize": 132723339,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locdodmaps-lvPVKz46dhg8Ujr/DOD_Maps_Addon_2017.zip",
@@ -40,7 +40,7 @@
         "InstallSize": 299048960
     },
     "HL1 Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/PqzsWirDkfrYtK8/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/5PiHJj65oSE9mAL/download",
         "PrimaryDownloadSize": 176955969,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl1-rmAScTdd3HTh65d/hl1_content_addon_apr2016.zip",
@@ -50,7 +50,7 @@
         "InstallSize": 336896000
     },
     "HL1 Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/7LrLoEfGewTY5eQ/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/NqYLkfr6GQjqFaL/download",
         "PrimaryDownloadSize": 130878661,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl1-rmAScTdd3HTh65d/hl1_maps_addon_apr2016.zip",
@@ -60,7 +60,7 @@
         "InstallSize": 341139456
     },
     "HL2 Ep1 Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/rkRDwxktKcTo5Sm/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/NoH5jgkgCwZRQNo/download",
         "PrimaryDownloadSize": 727060184,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl2e1content-1unoHYrK5z25D3P/HL2_Ep1_Content_Addon_2021.zip",
@@ -70,7 +70,7 @@
         "InstallSize": 1101631488
     },
     "HL2 Ep1 Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/Z6mBJqCAf2MksrL/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/dRWPYbpBT5jSyWp/download",
         "PrimaryDownloadSize": 254598608,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl2e1maps-659a3WyMtum935a/HL2_Ep1_Maps_Addon_2021.zip",
@@ -80,7 +80,7 @@
         "InstallSize": 558575616
     },
     "HL2 Ep2 Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/tQc9CYP74a22Tg5/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/CNfwJySpsre5cwt/download",
         "PrimaryDownloadSize": 1488763490,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl2e2content-2I2uG42I4C7G0no/HL2_Ep2_Content_Addon_2021.zip",
@@ -90,7 +90,7 @@
         "InstallSize": 2288857088
     },
     "HL2 Ep2 Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/zoLZAoJeTcY3i8k/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/sGNJSSoXJYkegE7/download",
         "PrimaryDownloadSize": 324830605,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl2e2maps-ZzW5Iq8FSB7Sl68/HL2_Ep2_Maps_Addon_2021.zip",
@@ -100,7 +100,7 @@
         "InstallSize": 761507840
     },
     "HL2 Extras Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/8MEMgR3rgKWWKfw/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/QPJWgQ6aZjYRnZ5/download",
         "PrimaryDownloadSize": 1737599088,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl2econtent-KDB1s70IXP1pRWm/HL2E_Content_Addon_2021.zip",
@@ -110,7 +110,7 @@
         "InstallSize": 2980012032
     },
     "HL2 Extras Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/Tigts4bkyr5jCCX/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/Hawpm7c4MfgFZzC/download",
         "PrimaryDownloadSize": 447980442,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/lochl2emaps-mxMzynw65XOZxId/HL2E_Maps_Addon_2021.zip",
@@ -120,7 +120,7 @@
         "InstallSize": 1001865216
     },
     "L4D Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/JnyNxSdWTrRsx92/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/jqQbrntLeL6Xpxz/download",
         "PrimaryDownloadSize": 2558069566,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locl4dcontent-2P5TdKD2OwVjsHK/l4d_content_addon_apr2016.zip",
@@ -130,7 +130,7 @@
         "InstallSize": 3643224064
     },
     "L4D Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/7ynewD7zmfycTy2/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/zEFH6WZ7pDGdtng/download",
         "PrimaryDownloadSize": 392866075,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locl4dmaps-k9fHeT3PZMdXGVm/l4d_maps_addon_apr2016_v2.zip",
@@ -140,7 +140,7 @@
         "InstallSize": 998961152
     },
     "L4D2 Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/nF7yKtMrFX7L7Hn/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/Db2CAjx5eW2ZsAg/download",
         "PrimaryDownloadSize": 6740174075,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locl4d2content-wJZ3DEy4LyApywZ/L4D2_Content_Addon_2021.zip",
@@ -150,7 +150,7 @@
         "InstallSize": 9357086720
     },
     "Portal 2 Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/wtm56iHyKccx4Mw/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/KkbBPBFzibfdsBG/download",
         "PrimaryDownloadSize": 4684660094,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locportal2content-uEhreQ580yaJjk4/Portal_2_Content_Addon.zip",
@@ -160,7 +160,7 @@
         "InstallSize": 7032442880
     },
     "Portal 2 Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/MeGgeR3WGqzPo4p/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/ybNjxgJz5X5tDoB/download",
         "PrimaryDownloadSize": 858037749,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locportal2maps-qWbTDwE65NY2r7j8/Portal_2_Maps_Addon_2021.zip",
@@ -170,7 +170,7 @@
         "InstallSize": 2977910784
     },
     "Portal Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/L4B2geJfy8SWRz4/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/r75qNFPdfEBDqRP/download",
         "PrimaryDownloadSize": 475464221,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locportalcontent-7HIKXLMLQBTb2yP/Portal_Content_Addon_2021.zip",
@@ -180,7 +180,7 @@
         "InstallSize": 728256512
     },
     "Portal Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/3SfGX8t6QA5Sak9/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/BSXBTwH7WFWtFYg/download",
         "PrimaryDownloadSize": 201964166,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/locportalmaps-Ewem6jHuE7V24bV/Portal_Maps_Addon_2021.zip",
@@ -190,7 +190,7 @@
         "InstallSize": 426672128
     },
     "TF2 Content": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/tRHEy2atiGj6BX9/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/FJ82tfQ8oEa8r99/download",
         "PrimaryDownloadSize": 6058482058,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/loctf2content-0U4s63K81zE0IYJ/TF2_Content_Addon_2021.zip",
@@ -200,7 +200,7 @@
         "InstallSize": 15384555520
     },
     "TF2 Maps": {
-        "PrimaryUrl": "https://nextcloud.serpensin.com/s/qBa8axX5T4BxNSs/download",
+        "PrimaryUrl": "https://nextcloud.serpensin.com/s/CbCypwrsF3nMjtc/download",
         "PrimaryDownloadSize": 3409085065,
         "PrimaryFormat": "tar.gz",
         "SecondaryUrl": "http://kajar9.myddns.me/downloads/loctf2-maps-ndrAQQP6ZdNV6O9/TF2_Maps_Addon_2021.zip",

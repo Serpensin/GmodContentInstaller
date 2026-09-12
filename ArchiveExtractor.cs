@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 
 namespace GModContentWizard
 {
@@ -145,7 +146,7 @@ namespace GModContentWizard
         {
             await Task.Run(() =>
             {
-                using var archive = TarArchive.Open(tarFilePath);
+                using var archive = TarArchive.OpenArchive(tarFilePath, new ReaderOptions());
                 ExtractEntriesWithProgress(archive, destinationPath, progressBar);
             });
         }
@@ -157,7 +158,7 @@ namespace GModContentWizard
         {
             await Task.Run(() =>
             {
-                using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipFilePath);
+                using var archive = SharpCompress.Archives.Zip.ZipArchive.OpenArchive(zipFilePath, new ReaderOptions());
                 ExtractEntriesWithProgress(archive, destinationPath, progressBar);
             });
         }
